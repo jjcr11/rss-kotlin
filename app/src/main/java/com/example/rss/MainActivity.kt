@@ -1,6 +1,7 @@
 package com.example.rss
 
 import android.content.ClipData
+import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -22,11 +23,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         supportActionBar?.hide()
 
         feedAdapter = FeedAdapter(getFeeds())
-
         linearLayoutManager = LinearLayoutManager(this)
 
         binding.rv.apply {
@@ -45,7 +44,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.mtb.menu.getItem(0).title = feedAdapter.itemCount.toString()
-        //binding.fabe.extend()
+
+        binding.fabe.setOnClickListener {
+            val sourcesActivity = Intent(this, SourcesActivity::class.java)
+            startActivity(sourcesActivity)
+        }
 
 
     }

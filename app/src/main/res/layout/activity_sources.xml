@@ -5,19 +5,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/gradiant">
+    tools:context=".SourcesActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/mtb"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/white"
-            app:title="Feed"
-            app:menu="@menu/top_app_bar"
+            android:background="@color/blue"
+            app:titleTextColor="@color/gray_light"
+            app:title="Sources"
+            app:menu="@menu/top_app_bar_sources"
             app:layout_scrollFlags="scroll|enterAlways|snap"/>
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -27,19 +27,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:listitem="@layout/headline_item"/>
-
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/fabe"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/common_default"
-        android:src="@drawable/ic_rss_feed"
-        android:text="@string/fabe_name"
-        app:backgroundTint="@color/blue_light"
-        android:textColor="@color/black"
-        app:iconTint="@color/black"
-        app:icon="@drawable/ic_rss_feed"/>
+        tools:listitem="@layout/sources_item"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

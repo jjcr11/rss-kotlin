@@ -6,15 +6,5 @@
     <color name="gray">#BCBABE</color>
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
+    <color name="red">#E62A2A</color>
 </resources>
-
-    <!--?xml version="1.0" encoding="utf-8"?>
-<resources>
-<color name="blue">#1995AD</color>
-<color name="blue_light">#A1D6E2</color>
-<color name="gray">#BCBABE</color>
-<color name="gray_light">#F1F1F2</color>
-<color name="black">#000000</color>
-<color name="white">#FFFFFF</color>
-<color name="white">#D3D3D3</color>
-</resources-->
