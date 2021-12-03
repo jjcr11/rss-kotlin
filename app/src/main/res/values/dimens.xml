@@ -3,4 +3,6 @@
     <dimen name="common_min">8dp</dimen>
     <dimen name="common_default">16dp</dimen>
     <dimen name="card_height">100dp</dimen>
+    <dimen name="card_elevation">4dp</dimen>
+    <dimen name="corner_radius">5dp</dimen>
 </resources>

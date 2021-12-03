@@ -1,7 +1,9 @@
 package com.example.rss
 
+import android.content.ClipData
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
 import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,6 +31,10 @@ class MainActivity : AppCompatActivity() {
             layoutManager = linearLayoutManager
             adapter = feedAdapter
         }
+
+        binding.mtb.menu.getItem(0).title = feedAdapter.itemCount.toString()
+
+
     }
 
     private fun getFeeds(): MutableList<Feed> {
