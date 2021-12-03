@@ -1,8 +1,10 @@
 package com.example.rss
 
 import android.content.ClipData
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.View
 import android.widget.Toast
@@ -32,7 +34,18 @@ class MainActivity : AppCompatActivity() {
             adapter = feedAdapter
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            binding.rv.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+                if(oldScrollY >= 0) {
+                    binding.fabe.extend()
+                } else {
+                    binding.fabe.shrink()
+                }
+            }
+        }
+
         binding.mtb.menu.getItem(0).title = feedAdapter.itemCount.toString()
+        //binding.fabe.extend()
 
 
     }

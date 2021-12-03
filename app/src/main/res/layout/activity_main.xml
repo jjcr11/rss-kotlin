@@ -29,11 +29,17 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:listitem="@layout/headline_item"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabe"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
         android:layout_margin="@dimen/common_default"
-        android:src="@drawable/ic_rss_feed"/>
+        android:src="@drawable/ic_rss_feed"
+        android:text="@string/fabe_name"
+        app:backgroundTint="@color/blue_light"
+        android:textColor="@color/black"
+        app:iconTint="@color/black"
+        app:icon="@drawable/ic_rss_feed"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
