@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rss.databinding.HeadlineItemBinding
 
+//Adapter to be used by the cards from headline_item.xml
 class FeedAdapter(private val feeds: List<Feed>): RecyclerView.Adapter<FeedAdapter.ViewHolder>() {
 
     private lateinit var context: Context

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rss.databinding.SourcesItemBinding
 
+//Adapter to be used by the cards from sources_item.xml
 class SourceAdapter(private val sources: List<Source>): RecyclerView.Adapter<SourceAdapter.ViewHolder>() {
 
     private lateinit var context: Context

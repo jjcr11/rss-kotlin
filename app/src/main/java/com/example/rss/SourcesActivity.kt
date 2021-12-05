@@ -1,10 +1,15 @@
 package com.example.rss
 
+import android.media.Image
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.ImageButton
+import android.widget.Toast
+import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rss.databinding.ActivitySourcesBinding
+import com.google.android.material.textfield.TextInputEditText
 
 class SourcesActivity : AppCompatActivity() {
 
@@ -16,6 +21,8 @@ class SourcesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySourcesBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        //Hide the action bar by default
         supportActionBar?.hide()
 
         sourceAdapter = SourceAdapter(getSources())
@@ -26,6 +33,26 @@ class SourcesActivity : AppCompatActivity() {
             adapter = sourceAdapter
         }
 
+        //View from other_source_bar.xml
+        val viewOtherSourceBar = layoutInflater.inflate(R.layout.other_source_bar, null)
+
+        //View from material tool bar in activity_sources.xml
+        val viewMaterialToolBar = binding.mtb
+
+        //When first item in top_app_bar_sources.xml is pressed  all view in app bar layout is removes and
+        //other_source_bar.xml is added
+        binding.mtb.menu.getItem(0).setOnMenuItemClickListener {
+            binding.abl.removeAllViews()
+            binding.abl.addView(viewOtherSourceBar)
+            true
+        }
+
+        //When imgCancel in other_source_bar.xml is pressed  all view in app bar layout is removes and
+        //material tool bar in activity_sources.xml is added
+        viewOtherSourceBar.findViewById<ImageButton>(R.id.imgCancel).setOnClickListener {
+            binding.abl.removeAllViews()
+            binding.abl.addView(viewMaterialToolBar)
+        }
     }
 
     private fun getSources(): MutableList<Source> {

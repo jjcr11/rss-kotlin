@@ -23,6 +23,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        //Hide the action bar by deafult
         supportActionBar?.hide()
 
         feedAdapter = FeedAdapter(getFeeds())
@@ -33,6 +35,7 @@ class MainActivity : AppCompatActivity() {
             adapter = feedAdapter
         }
 
+        //If the recycler view scrolls then floating action button extends or shrinks
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             binding.rv.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
                 if(oldScrollY >= 0) {
@@ -43,6 +46,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        //Get first item of top_app_bar.xml
         binding.mtb.menu.getItem(0).title = feedAdapter.itemCount.toString()
 
         binding.fabe.setOnClickListener {
