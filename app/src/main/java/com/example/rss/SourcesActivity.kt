@@ -3,6 +3,12 @@ package com.example.rss
 import android.media.Image
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.transition.Scene
+import android.transition.Transition
+import android.transition.TransitionInflater
+import android.transition.TransitionManager
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.core.view.get
@@ -10,6 +16,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rss.databinding.ActivitySourcesBinding
 import com.google.android.material.textfield.TextInputEditText
+import android.util.DisplayMetrics
+
+
+
 
 class SourcesActivity : AppCompatActivity() {
 
@@ -33,6 +43,30 @@ class SourcesActivity : AppCompatActivity() {
             adapter = sourceAdapter
         }
 
+        val viewOtherSourceBar = layoutInflater.inflate(R.layout.other_source_bar, null)
+        val v: View = binding.mtb
+
+        val transition: Transition = TransitionInflater
+            .from(this)
+            .inflateTransition(R.transition.fade_transition)
+
+        val scene1 = Scene(binding.abl, viewOtherSourceBar)
+        val scene2 = Scene(binding.abl, v)
+
+        binding.mtb.menu.getItem(0).setOnMenuItemClickListener {
+            TransitionManager.go(scene1, transition)
+            true
+        }
+
+        viewOtherSourceBar.findViewById<ImageButton>(R.id.imgCancel).setOnClickListener {
+            TransitionManager.go(scene2, transition)
+        }
+
+        
+
+
+
+        /*
         //View from other_source_bar.xml
         val viewOtherSourceBar = layoutInflater.inflate(R.layout.other_source_bar, null)
 
@@ -53,6 +87,7 @@ class SourcesActivity : AppCompatActivity() {
             binding.abl.removeAllViews()
             binding.abl.addView(viewMaterialToolBar)
         }
+        */
     }
 
     private fun getSources(): MutableList<Source> {
