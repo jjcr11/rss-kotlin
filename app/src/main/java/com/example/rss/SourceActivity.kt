@@ -11,6 +11,7 @@ import android.widget.ImageButton
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rss.databinding.ActivitySourcesBinding
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.textfield.TextInputEditText
 
 class SourceActivity : AppCompatActivity() {
@@ -59,8 +60,13 @@ class SourceActivity : AppCompatActivity() {
             true
         }
 
-        viewOtherSourceBar.findViewById<ImageButton>(R.id.imgCancel).setOnClickListener {
+        viewOtherSourceBar.findViewById<MaterialToolbar>(R.id.mtb).menu.getItem(0).setOnMenuItemClickListener {
             TransitionManager.go(fromAppBarLayoutToViewMaterialToolBar, transition)
+            viewOtherSourceBar.findViewById<TextInputEditText>(R.id.tiBar).setText("")
+            true
+        }
+
+        viewOtherSourceBar.findViewById<ImageButton>(R.id.imgb).setOnClickListener {
             val s1 = SourceEntity(
                 name = "Forbes Mexico",
                 url = viewOtherSourceBar.findViewById<TextInputEditText>(R.id.tiBar).text.toString()
@@ -81,7 +87,5 @@ class SourceActivity : AppCompatActivity() {
             sources = SourceApplication.database.sourceDao().getAllSources()
             sourceAdapter.setSources(sources)
         }.start()
-
     }
-
 }

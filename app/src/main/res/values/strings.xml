@@ -3,4 +3,5 @@
     <string name="fabe_name">SOURCES</string>
     <string name="unwatch_feed_count">0</string>
     <string name="add_source">Add</string>
+    <string name="tiedt_osb_hint">Rss link</string>
 </resources>
