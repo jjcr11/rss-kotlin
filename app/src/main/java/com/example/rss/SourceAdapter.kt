@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.rss.databinding.SourcesItemBinding
 
 //Adapter to be used by the cards from sources_item.xml
-class SourceAdapter(private val sources: List<Source>): RecyclerView.Adapter<SourceAdapter.ViewHolder>() {
+class SourceAdapter(private var sources: MutableList<SourceEntity>): RecyclerView.Adapter<SourceAdapter.ViewHolder>() {
 
     private lateinit var context: Context
 
@@ -34,4 +34,16 @@ class SourceAdapter(private val sources: List<Source>): RecyclerView.Adapter<Sou
         return sources.size
     }
 
+    fun add(sourceEntity: SourceEntity) {
+        sources.add(sourceEntity)
+        //This show the added sourceEntity in the view immediately
+        notifyDataSetChanged()
+    }
+
+    fun setSources(sources: MutableList<SourceEntity>) {
+        this.sources = sources
+        //This show the added sourceEntity in the view immediately
+        notifyDataSetChanged()
+
+    }
 }

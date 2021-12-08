@@ -8,13 +8,12 @@ import android.transition.TransitionInflater
 import android.transition.TransitionManager
 import android.view.View
 import android.widget.ImageButton
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rss.databinding.ActivitySourcesBinding
 import com.google.android.material.textfield.TextInputEditText
 
-class SourcesActivity : AppCompatActivity() {
+class SourceActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySourcesBinding
     private lateinit var sourceAdapter: SourceAdapter
@@ -28,8 +27,12 @@ class SourcesActivity : AppCompatActivity() {
         //Hide the action bar by default
         supportActionBar?.hide()
 
-        sourceAdapter = SourceAdapter(getSources())
         linearLayoutManager = LinearLayoutManager(this)
+
+        //First initialize sourceAdapter with a empty mutable list
+        sourceAdapter = SourceAdapter(mutableListOf())
+        //After call getSources to get sources into the database
+        getSources()
 
         binding.rv.apply {
             layoutManager = linearLayoutManager
@@ -58,27 +61,27 @@ class SourcesActivity : AppCompatActivity() {
 
         viewOtherSourceBar.findViewById<ImageButton>(R.id.imgCancel).setOnClickListener {
             TransitionManager.go(fromAppBarLayoutToViewMaterialToolBar, transition)
+            val s1 = SourceEntity(
+                name = "Forbes Mexico",
+                url = viewOtherSourceBar.findViewById<TextInputEditText>(R.id.tiBar).text.toString()
+            )
+            //With SourceApplication use sourceDao to add s1
+            Thread {
+                SourceApplication.database.sourceDao().addSource(s1)
+            }.start()
+            //Add s1 to sourceAdapter to see the change
+            sourceAdapter.add(s1)
         }
     }
 
-    private fun getSources(): MutableList<Source> {
-        val sources = mutableListOf<Source>()
-        val s1 = Source("Forbes Mexico", "forbesmexico.com/feed")
-        val s2 = Source("Mientras tanto en Mexico", "mientrastantoenmexico.com/feed")
-        val s3 = Source("Xataka Mexico", "xatakamexico.com/feed")
-        sources.add(s1)
-        sources.add(s2)
-        sources.add(s3)
-        sources.add(s1)
-        sources.add(s2)
-        sources.add(s3)
-        sources.add(s1)
-        sources.add(s2)
-        sources.add(s3)
-        sources.add(s1)
-        sources.add(s2)
-        sources.add(s3)
-        return sources
+    //Function to get sources into the database
+    private fun getSources() {
+        var sources: MutableList<SourceEntity>
+        Thread {
+            sources = SourceApplication.database.sourceDao().getAllSources()
+            sourceAdapter.setSources(sources)
+        }.start()
+
     }
 
 }

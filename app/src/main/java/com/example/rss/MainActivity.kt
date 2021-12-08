@@ -1,14 +1,9 @@
 package com.example.rss
 
-import android.content.ClipData
 import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.Menu
-import android.view.View
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rss.databinding.ActivityMainBinding
@@ -50,8 +45,8 @@ class MainActivity : AppCompatActivity() {
         binding.mtb.menu.getItem(0).title = feedAdapter.itemCount.toString()
 
         binding.fabe.setOnClickListener {
-            val sourcesActivity = Intent(this, SourcesActivity::class.java)
-            startActivity(sourcesActivity)
+            val sourceActivity = Intent(this, SourceActivity::class.java)
+            startActivity(sourceActivity)
         }
 
 
