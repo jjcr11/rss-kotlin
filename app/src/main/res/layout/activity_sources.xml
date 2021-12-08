@@ -4,23 +4,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    tools:context=".SourceActivity">
+    android:layout_height="wrap_content">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/abl"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:liftOnScroll="true">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/mtb"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/blue"
-            app:titleTextColor="@color/gray_light"
+            android:background="@color/white"
+            app:titleTextColor="@color/black"
             app:title="Sources"
-            app:menu="@menu/top_app_bar_sources"
-            app:layout_scrollFlags="scroll|enterAlways|snap"/>
+            app:menu="@menu/top_app_bar_sources"/>
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -29,6 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:listitem="@layout/sources_item"/>
+        tools:listitem="@layout/sources_item"
+        android:elevation="0dp"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

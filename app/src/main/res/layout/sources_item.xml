@@ -4,8 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:elevation="0dp">
+    android:layout_height="70dp"
+    app:cardCornerRadius="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -18,7 +18,8 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_rss_feed"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
         <TextView
             android:id="@+id/tvName"
@@ -29,18 +30,21 @@
             android:textSize="@dimen/common_default"
             android:textColor="@color/black"
             android:maxLines="1"
-            app:layout_constraintTop_toTopOf="@+id/img"
             app:layout_constraintStart_toEndOf="@+id/img"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/img"
             tools:text="Forbes Mexico"/>
 
         <TextView
             android:id="@+id/tvUrl"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:layout_marginTop="@dimen/common_min"
             android:textColor="@color/gray"
-            app:layout_constraintTop_toBottomOf="@id/img"
+            app:layout_constraintStart_toStartOf="@id/tvName"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="@id/img"
             tools:text="https://www.forbes.com.mx/tag/feed/"/>
 
         <ImageView
@@ -56,6 +60,9 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/black"/>
+        android:layout_gravity="bottom"
+        android:background="@color/gray"/>
+
+
 
 </androidx.cardview.widget.CardView>
