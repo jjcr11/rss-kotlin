@@ -14,6 +14,7 @@ class SourceApplication: Application() {
         database = Room.databaseBuilder(this,
             SourceDatabase::class.java,
             "SourceDatabase")
+            .fallbackToDestructiveMigration()
             .build()
     }
 }

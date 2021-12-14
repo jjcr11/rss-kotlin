@@ -1,5 +1,6 @@
 package com.example.rss
 
+import android.os.AsyncTask
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.transition.Scene
@@ -13,6 +14,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.rss.databinding.ActivitySourcesBinding
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.textfield.TextInputEditText
+import org.xmlpull.v1.XmlPullParserException
+import java.io.IOException
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
 
 class SourceActivity : AppCompatActivity() {
 
@@ -67,16 +73,9 @@ class SourceActivity : AppCompatActivity() {
         }
 
         viewOtherSourceBar.findViewById<ImageButton>(R.id.imgb).setOnClickListener {
-            val s1 = SourceEntity(
-                name = "Forbes Mexico",
-                url = viewOtherSourceBar.findViewById<TextInputEditText>(R.id.tiBar).text.toString()
+            DownloadXmlTask().execute(
+                viewOtherSourceBar.findViewById<TextInputEditText>(R.id.tiBar).text.toString()
             )
-            //With SourceApplication use sourceDao to add s1
-            Thread {
-                SourceApplication.database.sourceDao().addSource(s1)
-            }.start()
-            //Add s1 to sourceAdapter to see the change
-            sourceAdapter.add(s1)
         }
     }
 
@@ -87,5 +86,51 @@ class SourceActivity : AppCompatActivity() {
             sources = SourceApplication.database.sourceDao().getAllSources()
             sourceAdapter.setSources(sources)
         }.start()
+    }
+
+    private inner class DownloadXmlTask : AsyncTask<String, Void, String>() {
+        override fun doInBackground(vararg urls: String): String {
+            return try {
+                loadXmlFromNetwork(urls[0])
+            } catch (e: IOException) {
+                "resources.getString(R.string.connection_error)"
+            } catch (e: XmlPullParserException) {
+                "resources.getString(R.string.xml_error)"
+            }
+        }
+
+        override fun onPostExecute(result: String) {
+            val data = result.split(",")
+            val s1 = SourceEntity(
+                name = data[0],
+                url = data[1]
+            )
+            Thread {
+                SourceApplication.database.sourceDao().addSource(s1)
+            }.start()
+            sourceAdapter.add(s1)
+        }
+
+    }
+
+    @Throws(XmlPullParserException::class, IOException::class)
+    private fun loadXmlFromNetwork(urlString: String): String {
+        val source: SourceEntity? = downloadUrl(urlString)?.use { stream ->
+            XmlParser().parse(stream)
+        } ?: null
+        return "${source?.name},${source?.url}"
+    }
+
+    @Throws(IOException::class)
+    private fun downloadUrl(urlString: String): InputStream? {
+        val url = URL(urlString)
+        return (url.openConnection() as? HttpURLConnection)?.run {
+            readTimeout = 10000
+            connectTimeout = 15000
+            requestMethod = "GET"
+            doInput = true
+            connect()
+            inputStream
+        }
     }
 }
