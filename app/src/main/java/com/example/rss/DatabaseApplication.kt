@@ -4,16 +4,16 @@ import android.app.Application
 import androidx.room.Room
 
 //Class to use database in any class
-class SourceApplication: Application() {
+class DatabaseApplication: Application() {
     companion object {
-        lateinit var database: SourceDatabase
+        lateinit var database: Database
     }
 
     override fun onCreate() {
         super.onCreate()
         database = Room.databaseBuilder(this,
-            SourceDatabase::class.java,
-            "SourceDatabase")
+            Database::class.java,
+            "Database")
             .fallbackToDestructiveMigration()
             .build()
     }

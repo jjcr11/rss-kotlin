@@ -3,7 +3,7 @@ package com.example.rss
 import androidx.room.*
 
 @Dao
-interface SourceDao {
+interface DatabaseDao {
     @Query("SELECT * FROM SourceEntity")
     fun getAllSources(): MutableList<SourceEntity>
 
