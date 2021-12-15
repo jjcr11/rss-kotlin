@@ -5,5 +5,5 @@ import androidx.room.RoomDatabase
 
 @Database(entities = arrayOf(SourceEntity::class), version = 2)
 abstract class SourceDatabase: RoomDatabase() {
-    abstract fun sourceDao(): SourceDao
+    abstract fun sourceDao(): DatabaseDao
 }
