@@ -25,6 +25,7 @@ class SourceActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySourcesBinding
     private lateinit var sourceAdapter: SourceAdapter
     private lateinit var linearLayoutManager: RecyclerView.LayoutManager
+    private lateinit var viewOtherSourceBar: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +48,8 @@ class SourceActivity : AppCompatActivity() {
         }
 
         //View from other_source_bat.xml to do the transition
-        val viewOtherSourceBar = layoutInflater.inflate(R.layout.other_source_bar, null)
+        //val viewOtherSourceBar = layoutInflater.inflate(R.layout.other_source_bar, null)
+        viewOtherSourceBar = layoutInflater.inflate(R.layout.other_source_bar, null)
         //View from the material tool bar in activity_source.xml
         val viewMaterialToolBar: View = binding.mtb
 
@@ -100,10 +102,9 @@ class SourceActivity : AppCompatActivity() {
         }
 
         override fun onPostExecute(result: String) {
-            val data = result.split(",")
             val s1 = SourceEntity(
-                name = data[0],
-                url = data[1]
+                name = result,
+                url = viewOtherSourceBar.findViewById<TextInputEditText>(R.id.tiBar).text.toString()
             )
             Thread {
                 SourceApplication.database.sourceDao().addSource(s1)
@@ -117,8 +118,8 @@ class SourceActivity : AppCompatActivity() {
     private fun loadXmlFromNetwork(urlString: String): String {
         val source: SourceEntity? = downloadUrl(urlString)?.use { stream ->
             XmlParser().parse(stream)
-        } ?: null
-        return "${source?.name},${source?.url}"
+        }
+        return source?.name.toString()
     }
 
     @Throws(IOException::class)
