@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.rss.databinding.HeadlineItemBinding
 
 //Adapter to be used by the cards from headline_item.xml
-class FeedAdapter(private val feeds: List<Feed>): RecyclerView.Adapter<FeedAdapter.ViewHolder>() {
+class FeedAdapter(private val feeds: List<FeedEntity>): RecyclerView.Adapter<FeedAdapter.ViewHolder>() {
 
     private lateinit var context: Context
 
@@ -26,8 +26,8 @@ class FeedAdapter(private val feeds: List<Feed>): RecyclerView.Adapter<FeedAdapt
         val feed = feeds.get(position)
         with(holder) {
             binding.tvTitle.text = feed.title
-            binding.tvSource.text = feed.source
-            binding.tvHour.text = feed.hour.toString()
+            binding.tvSource.text = feed.sourceId.toString()
+            binding.tvHour.text = feed.date.toString()
 
         }
     }
