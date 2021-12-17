@@ -10,7 +10,6 @@ import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rss.databinding.ActivityMainBinding
-import com.google.android.material.textfield.TextInputEditText
 import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
 import java.io.InputStream
@@ -30,7 +29,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        //Hide the action bar by deafult
+        //Hide the action bar by default
         supportActionBar?.hide()
 
         feedAdapter = FeedAdapter(mutableListOf())
@@ -45,7 +44,7 @@ class MainActivity : AppCompatActivity() {
 
         //If the recycler view scrolls then floating action button extends or shrinks
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            binding.rv.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            binding.rv.setOnScrollChangeListener { _, _, _, _, oldScrollY ->
                 if(oldScrollY >= 0) {
                     binding.fabe.extend()
                 } else {
@@ -70,7 +69,7 @@ class MainActivity : AppCompatActivity() {
 
         /*var feeds: MutableList<FeedEntity>
         Thread {
-            feeds = DatabaseApplication.database.sourceDao().getAllFeeds()
+            feeds = DatabaseApplication.database.dao().getFeeds()
             //sourceAdapter.setSources(sources)
             Log.d("FEEDS: ", feeds.size.toString())
             //feedAdapter.setFeeds(feeds)
@@ -80,7 +79,7 @@ class MainActivity : AppCompatActivity() {
         var sources: MutableList<SourceEntity> = mutableListOf()
         Thread {
             //getFeeds()
-            sources = DatabaseApplication.database.sourceDao().getAllSources()
+            sources = DatabaseApplication.database.dao().getSources()
         }.start()
         Timer().schedule(1000){
             if(sources.size != 0) {
@@ -123,7 +122,7 @@ class MainActivity : AppCompatActivity() {
             for(feed: FeedEntity in feeds){
                 //Log.d("TITLE: ", feed.title)
                 try {
-                    DatabaseApplication.database.sourceDao().addFeed(feed)
+                    DatabaseApplication.database.dao().addFeed(feed)
                 } catch (e: SQLiteConstraintException) {
                     Log.d("TITLE: ", e.toString())
                 }
@@ -149,7 +148,7 @@ class MainActivity : AppCompatActivity() {
     private fun getFeeds() {
         var feeds: MutableList<FeedEntity>
         Thread {
-            feeds = DatabaseApplication.database.sourceDao().getAllFeeds()
+            feeds = DatabaseApplication.database.dao().getFeeds()
             feedAdapter.setFeeds(feeds)
         }.start()
     }

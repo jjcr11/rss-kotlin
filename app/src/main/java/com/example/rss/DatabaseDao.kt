@@ -5,16 +5,10 @@ import androidx.room.*
 @Dao
 interface DatabaseDao {
     @Query("SELECT * FROM SourceEntity")
-    fun getAllSources(): MutableList<SourceEntity>
-
-    @Query("SELECT * FROM FeedEntity")
-    fun getAllFeeds(): MutableList<FeedEntity>
+    fun getSources(): MutableList<SourceEntity>
 
     @Insert
     fun addSource(sourceEntity: SourceEntity)
-
-    @Insert
-    fun addFeed(feedEntity: FeedEntity)
 
     @Update
     fun updateSource(sourceEntity: SourceEntity)
@@ -22,8 +16,14 @@ interface DatabaseDao {
     @Delete
     fun deleteSource(sourceEntity: SourceEntity)
 
+    @Query("SELECT * FROM FeedEntity")
+    fun getFeeds(): MutableList<FeedEntity>
+
+    @Insert
+    fun addFeed(feedEntity: FeedEntity)
+
     @Query("SELECT * FROM SourceEntity")
-    fun getAllSourcesFeed(): MutableList<SourceFeedRelation>
+    fun getSourcesFeed(): MutableList<SourceFeedRelation>
 
     @Query("SELECT name FROM SourceEntity WHERE id = :id")
     fun getSourceNameByID(id: Int): String

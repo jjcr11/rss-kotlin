@@ -24,11 +24,11 @@ class FeedAdapter(private var feeds: List<FeedEntity>): RecyclerView.Adapter<Fee
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         Thread {
-            val feed = feeds.get(position)
+            val feed = feeds[position]
             with(holder) {
                 binding.tvTitle.text = feed.title
                 binding.tvSource.text =
-                    DatabaseApplication.database.sourceDao().getSourceNameByID(feed.sourceId)
+                    DatabaseApplication.database.dao().getSourceNameByID(feed.sourceId)
                 binding.tvHour.text = feed.date.toString()
 
             }
@@ -43,5 +43,4 @@ class FeedAdapter(private var feeds: List<FeedEntity>): RecyclerView.Adapter<Fee
         this.feeds = feeds
         notifyDataSetChanged()
     }
-
 }

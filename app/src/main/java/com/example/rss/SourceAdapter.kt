@@ -23,7 +23,7 @@ class SourceAdapter(private var sources: MutableList<SourceEntity>): RecyclerVie
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val source = sources.get(position)
+        val source = sources[position]
         with(holder) {
             binding.tvName.text = source.name
             binding.tvUrl.text = source.url

@@ -85,7 +85,7 @@ class SourceActivity : AppCompatActivity() {
     private fun getSources() {
         var sources: MutableList<SourceEntity>
         Thread {
-            sources = DatabaseApplication.database.sourceDao().getAllSources()
+            sources = DatabaseApplication.database.dao().getSources()
             sourceAdapter.setSources(sources)
         }.start()
     }
@@ -107,7 +107,7 @@ class SourceActivity : AppCompatActivity() {
                 url = viewOtherSourceBar.findViewById<TextInputEditText>(R.id.tiBar).text.toString()
             )
             Thread {
-                DatabaseApplication.database.sourceDao().addSource(s1)
+                DatabaseApplication.database.dao().addSource(s1)
             }.start()
             sourceAdapter.add(s1)
         }
