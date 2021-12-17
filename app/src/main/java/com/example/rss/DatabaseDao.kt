@@ -24,4 +24,7 @@ interface DatabaseDao {
 
     @Query("SELECT * FROM SourceEntity")
     fun getAllSourcesFeed(): MutableList<SourceFeedRelation>
+
+    @Query("SELECT name FROM SourceEntity WHERE id = :id")
+    fun getSourceNameByID(id: Int): String
 }

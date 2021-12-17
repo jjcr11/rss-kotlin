@@ -1,6 +1,7 @@
 package com.example.rss
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
@@ -9,10 +10,10 @@ import java.lang.IllegalStateException
 import java.util.*
 
 //Data class to be used by FeedAdapter
-@Entity(tableName = "FeedEntity")
+@Entity(tableName = "FeedEntity", indices = arrayOf(Index(value = ["title"], unique = true)))
 data class FeedEntity(@PrimaryKey(autoGenerate = true) var id: Int = 0,
                       var title: String,
-                      var link: String,
+                      var url: String,
                       var author: String?,
                       var date: Date?,
                       var content: String,
@@ -41,7 +42,7 @@ fun readItem(parser: XmlPullParser, sourceId: Int): FeedEntity {
             else -> skip(parser)
         }
     }
-    return FeedEntity(title = title, link = link, author = author, date = date, content = content, sourceId = sourceId)
+    return FeedEntity(title = title, url = link, author = author, date = date, content = content, sourceId = sourceId)
 }
 
 @Throws(XmlPullParserException::class, IOException::class)

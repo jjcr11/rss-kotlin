@@ -1,6 +1,7 @@
 package com.example.rss
 
 import android.content.Intent
+import android.database.sqlite.SQLiteConstraintException
 import android.os.AsyncTask
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -32,7 +33,9 @@ class MainActivity : AppCompatActivity() {
         //Hide the action bar by deafult
         supportActionBar?.hide()
 
-        feedAdapter = FeedAdapter(getFeeds())
+        feedAdapter = FeedAdapter(mutableListOf())
+        getFeeds()
+
         linearLayoutManager = LinearLayoutManager(this)
 
         binding.rv.apply {
@@ -65,15 +68,18 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        var feeds: MutableList<FeedEntity>
+        /*var feeds: MutableList<FeedEntity>
         Thread {
             feeds = DatabaseApplication.database.sourceDao().getAllFeeds()
             //sourceAdapter.setSources(sources)
             Log.d("FEEDS: ", feeds.size.toString())
-        }.start()
+            //feedAdapter.setFeeds(feeds)
+        }.start()*/
+
 
         var sources: MutableList<SourceEntity> = mutableListOf()
         Thread {
+            //getFeeds()
             sources = DatabaseApplication.database.sourceDao().getAllSources()
         }.start()
         Timer().schedule(1000){
@@ -86,6 +92,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
 
     }
 
@@ -114,8 +121,12 @@ class MainActivity : AppCompatActivity() {
 
         if (feeds != null) {
             for(feed: FeedEntity in feeds){
-                Log.d("TITLE: ", feed.title)
-                DatabaseApplication.database.sourceDao().addFeed(feed)
+                //Log.d("TITLE: ", feed.title)
+                try {
+                    DatabaseApplication.database.sourceDao().addFeed(feed)
+                } catch (e: SQLiteConstraintException) {
+                    Log.d("TITLE: ", e.toString())
+                }
             }
         }
 
@@ -135,21 +146,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun getFeeds(): MutableList<FeedEntity> {
-        val feeds = mutableListOf<FeedEntity>()
-        /*val f1 = FeedEntity("398 comerciantes en el docenario guadalupano", "El noticiero de Manzanillo", 1)
-        val f2 = FeedEntity("Como descargar el certificado COVID de la forma mas sencilla para llevarlo siempre", "Genbeta", 1)
-        val f3 = FeedEntity("Endows, a Singapore-based robo-advisor app, raise $25.6M to bring its total funding to $49M as it looks to speed up its hiring for geographic expansion speed up its hiring for geographic expansion", "Techmeme", 1)
-        feeds.add(f1)
-        feeds.add(f2)
-        feeds.add(f3)
-        feeds.add(f1)
-        feeds.add(f2)
-        feeds.add(f3)
-        feeds.add(f1)
-        feeds.add(f2)
-        feeds.add(f3)*/
-        return feeds
+    private fun getFeeds() {
+        var feeds: MutableList<FeedEntity>
+        Thread {
+            feeds = DatabaseApplication.database.sourceDao().getAllFeeds()
+            feedAdapter.setFeeds(feeds)
+        }.start()
     }
 
 }

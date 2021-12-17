@@ -62,7 +62,6 @@ class XmlParser {
                 continue
             }
             if (parser.name == "item") {
-                Log.d("MMMMMMMMMMM", "MMMMMMMMMMMY")
                 items.add(readItem(parser, sourceId))
             } else {
                 skip(parser)
