@@ -32,7 +32,8 @@ class MainActivity : AppCompatActivity() {
         //Hide the action bar by default
         supportActionBar?.hide()
 
-        feedAdapter = FeedAdapter(mutableListOf())
+        feedAdapter = FeedAdapter(mutableListOf(), mutableListOf())
+        getData()
         getFeeds()
 
         linearLayoutManager = LinearLayoutManager(this)
@@ -64,35 +65,23 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        /*var feeds: MutableList<FeedEntity>
-        Thread {
-            feeds = DatabaseApplication.database.dao().getFeeds()
-            //sourceAdapter.setSources(sources)
-            Log.d("FEEDS: ", feeds.size.toString())
-            //feedAdapter.setFeeds(feeds)
-        }.start()*/
-
-
+    private fun getData() {
         var sources: MutableList<SourceEntity> = mutableListOf()
         Thread {
-            //getFeeds()
             sources = DatabaseApplication.database.dao().getSources()
         }.start()
         Timer().schedule(1000){
-            if(sources.size != 0) {
+            if(sources.size > 0) {
                 for(source: SourceEntity in sources) {
                     DownloadXmlTask().execute(
                         source.url,
                         source.id.toString()
                     )
                 }
+            } else {
+                Log.d("ELSE", "ENTRO")
             }
         }
-
-
     }
 
     private inner class DownloadXmlTask : AsyncTask<String, Void, String>() {
@@ -119,8 +108,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (feeds != null) {
-            for(feed: FeedEntity in feeds){
-                //Log.d("TITLE: ", feed.title)
+            for(feed: FeedEntity in feeds) {
                 try {
                     DatabaseApplication.database.dao().addFeed(feed)
                 } catch (e: SQLiteConstraintException) {
@@ -147,9 +135,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun getFeeds() {
         var feeds: MutableList<FeedEntity>
+        val sources: MutableList<String> = mutableListOf()
         Thread {
             feeds = DatabaseApplication.database.dao().getFeeds()
+            for(feed: FeedEntity in feeds) {
+                sources.add(DatabaseApplication.database.dao().getSourceNameByID(feed.sourceId))
+            }
             feedAdapter.setFeeds(feeds)
+            feedAdapter.setSources(sources)
         }.start()
     }
 
