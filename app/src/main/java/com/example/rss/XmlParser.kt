@@ -136,6 +136,7 @@ class XmlParser {
         var author: String? = null
         var date: Date? = null
         var content = ""
+        var description = ""
         while(parser.next() != XmlPullParser.END_TAG) {
             if(parser.eventType != XmlPullParser.START_TAG) {
                 continue
@@ -145,11 +146,16 @@ class XmlParser {
                 "link" -> link = readLink(parser)
                 "dc:creator" -> author = readAuthor(parser)
                 "pubDate" -> date = readDate(parser)
-                "content:encoded" -> content = readContent(parser)
+                "content:encoded" -> content = readContent(parser, "content:encoded")
+                "description" -> description = readContent(parser, "description")
                 else -> skip(parser)
             }
         }
-        return FeedEntity(title = title, url = link, author = author, date = date, content = content, sourceId = sourceId)
+        if(content.length > description.length) {
+            return FeedEntity(title = title, url = link, author = author, date = date, content = content, sourceId = sourceId)
+        } else {
+            return FeedEntity(title = title, url = link, author = author, date = date, content = description, sourceId = sourceId)
+        }
     }
 
     @Throws(XmlPullParserException::class, IOException::class)
@@ -186,10 +192,10 @@ class XmlParser {
     }
 
     @Throws(XmlPullParserException::class, IOException::class)
-    private fun readContent(parser: XmlPullParser): String {
-        parser.require(XmlPullParser.START_TAG, ns, "content:encoded")
+    private fun readContent(parser: XmlPullParser, name: String): String {
+        parser.require(XmlPullParser.START_TAG, ns, name)
         val title = readText(parser)
-        parser.require(XmlPullParser.END_TAG, ns, "content:encoded")
+        parser.require(XmlPullParser.END_TAG, ns, name)
         return title
     }
 }

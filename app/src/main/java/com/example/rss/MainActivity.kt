@@ -33,8 +33,10 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.hide()
 
         feedAdapter = FeedAdapter(mutableListOf(), mutableListOf())
-        getData()
-        getFeeds()
+        Thread {
+            getData()
+            getFeeds()
+        }.start()
 
         linearLayoutManager = LinearLayoutManager(this)
 
@@ -67,9 +69,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun getData() {
         var sources: MutableList<SourceEntity> = mutableListOf()
-        Thread {
+        //Thread {
             sources = DatabaseApplication.database.dao().getSources()
-        }.start()
+        //}.start()
         Timer().schedule(1000){
             if(sources.size > 0) {
                 for(source: SourceEntity in sources) {
@@ -136,14 +138,14 @@ class MainActivity : AppCompatActivity() {
     private fun getFeeds() {
         var feeds: MutableList<FeedEntity>
         val sources: MutableList<String> = mutableListOf()
-        Thread {
+        //Thread {
             feeds = DatabaseApplication.database.dao().getFeeds()
             for(feed: FeedEntity in feeds) {
                 sources.add(DatabaseApplication.database.dao().getSourceNameByID(feed.sourceId))
             }
             feedAdapter.setFeeds(feeds)
             feedAdapter.setSources(sources)
-        }.start()
+        //}.start()
     }
 
 }

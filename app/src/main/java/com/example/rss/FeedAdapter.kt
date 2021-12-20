@@ -44,5 +44,6 @@ class FeedAdapter(private var feeds: List<FeedEntity>, private var sources: Muta
 
     fun setSources(sources: MutableList<String>) {
         this.sources = sources
+        notifyDataSetChanged()
     }
 }
