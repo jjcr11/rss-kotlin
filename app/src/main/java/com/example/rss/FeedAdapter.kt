@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.rss.databinding.HeadlineItemBinding
 
 //Adapter to be used by the cards from headline_item.xml
-class FeedAdapter(private var feeds: List<FeedEntity>, private var sources: MutableList<String>): RecyclerView.Adapter<FeedAdapter.ViewHolder>() {
+class FeedAdapter(private var feeds: MutableList<FeedEntity>, private var sources: MutableList<String>): RecyclerView.Adapter<FeedAdapter.ViewHolder>() {
 
     private lateinit var context: Context
 
@@ -26,18 +26,23 @@ class FeedAdapter(private var feeds: List<FeedEntity>, private var sources: Muta
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val feed = feeds[position]
         val source = sources[position]
-            with(holder) {
-                binding.tvTitle.text = feed.title
-                binding.tvSource.text = source
-                binding.tvHour.text = feed.date.toString()
-            }
+        with(holder) {
+            binding.tvTitle.text = feed.title
+            binding.tvSource.text = source
+            binding.tvHour.text = feed.date.toString()
+        }
     }
 
     override fun getItemCount(): Int {
         return feeds.size
     }
 
-    fun setFeeds(feeds: List<FeedEntity>) {
+    fun add(feedEntity: FeedEntity) {
+        feeds.add(feedEntity)
+        notifyDataSetChanged()
+    }
+
+    fun setFeeds(feeds: MutableList<FeedEntity>) {
         this.feeds = feeds
         notifyDataSetChanged()
     }

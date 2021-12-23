@@ -2,7 +2,6 @@ package com.example.rss
 
 import android.content.Intent
 import android.database.sqlite.SQLiteConstraintException
-import android.os.AsyncTask
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -15,8 +14,6 @@ import java.io.IOException
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.*
-import kotlin.concurrent.schedule
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,10 +30,6 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.hide()
 
         feedAdapter = FeedAdapter(mutableListOf(), mutableListOf())
-        Thread {
-            getData()
-            getFeeds()
-        }.start()
 
         linearLayoutManager = LinearLayoutManager(this)
 
@@ -67,49 +60,30 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        getData()
+        getFeeds()
+    }
+
     private fun getData() {
         var sources: MutableList<SourceEntity> = mutableListOf()
-        //Thread {
+        val t = Thread {
             sources = DatabaseApplication.database.dao().getSources()
-        //}.start()
-        Timer().schedule(1000){
-            if(sources.size > 0) {
-                for(source: SourceEntity in sources) {
-                    DownloadXmlTask().execute(
-                        source.url,
-                        source.id.toString()
-                    )
-                }
-            } else {
-                Log.d("ELSE", "ENTRO")
+        }
+        t.start()
+        t.join()
+        if(sources.size > 0) {
+            for(source: SourceEntity in sources) {
+                downloadXmlTask(source.url, source.id)
             }
         }
     }
 
-    private inner class DownloadXmlTask : AsyncTask<String, Void, String>() {
-        override fun doInBackground(vararg urls: String): String {
-            return try {
-                loadXmlFromNetwork(urls[0], urls[1].toInt())
-            } catch (e: IOException) {
-                "resources.getString(R.string.connection_error)"
-            } catch (e: XmlPullParserException) {
-                "resources.getString(R.string.xml_error)"
-            }
-        }
-
-        override fun onPostExecute(result: String) {
-            //Log.d("TITLE: ", result)
-        }
-
-    }
-
-    @Throws(XmlPullParserException::class, IOException::class)
-    private fun loadXmlFromNetwork(urlString: String, sourceId: Int): String {
-        val feeds: List<FeedEntity>? = downloadUrl(urlString)?.use { stream ->
-            XmlParser().parse(stream, sourceId)
-        }
-
-        if (feeds != null) {
+    private fun downloadXmlTask(url: String?, id: Int) {
+        var feeds: List<FeedEntity> = mutableListOf()
+        val t = Thread {
+            feeds = loadXmlFromNetwork(url, id)
             for(feed: FeedEntity in feeds) {
                 try {
                     DatabaseApplication.database.dao().addFeed(feed)
@@ -118,12 +92,23 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        t.start()
+        t.join()
+        //for(feed: FeedEntity in feeds) {
+        //    feedAdapter.add(feed)
+        //}
+    }
 
-        return feeds?.get(0)?.title.toString()
+    @Throws(XmlPullParserException::class, IOException::class)
+    private fun loadXmlFromNetwork(urlString: String?, sourceId: Int): List<FeedEntity> {
+        val feeds: List<FeedEntity> = downloadUrl(urlString)?.use { stream ->
+            XmlParser().parse(stream, sourceId)
+        }!!
+        return feeds
     }
 
     @Throws(IOException::class)
-    private fun downloadUrl(urlString: String): InputStream? {
+    private fun downloadUrl(urlString: String?): InputStream? {
         val url = URL(urlString)
         return (url.openConnection() as? HttpURLConnection)?.run {
             readTimeout = 10000
@@ -136,16 +121,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getFeeds() {
-        var feeds: MutableList<FeedEntity>
+        var feeds: MutableList<FeedEntity> = mutableListOf()
         val sources: MutableList<String> = mutableListOf()
-        //Thread {
+        val t = Thread {
             feeds = DatabaseApplication.database.dao().getFeeds()
             for(feed: FeedEntity in feeds) {
-                sources.add(DatabaseApplication.database.dao().getSourceNameByID(feed.sourceId))
+                sources.add(
+                    DatabaseApplication.database.dao().getSourceNameByID(feed.sourceId)
+                )
             }
-            feedAdapter.setFeeds(feeds)
-            feedAdapter.setSources(sources)
-        //}.start()
+        }
+        t.start()
+        t.join()
+        feedAdapter.setFeeds(feeds)
+        feedAdapter.setSources(sources)
     }
-
 }

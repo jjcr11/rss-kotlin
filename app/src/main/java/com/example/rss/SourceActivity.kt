@@ -1,6 +1,5 @@
 package com.example.rss
 
-import android.os.AsyncTask
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.transition.Scene
@@ -75,7 +74,7 @@ class SourceActivity : AppCompatActivity() {
         }
 
         viewOtherSourceBar.findViewById<ImageButton>(R.id.imgb).setOnClickListener {
-            DownloadXmlTask().execute(
+            downloadXmlTask(
                 viewOtherSourceBar.findViewById<TextInputEditText>(R.id.tiBar).text.toString()
             )
         }
@@ -90,28 +89,19 @@ class SourceActivity : AppCompatActivity() {
         }.start()
     }
 
-    private inner class DownloadXmlTask : AsyncTask<String, Void, String>() {
-        override fun doInBackground(vararg urls: String): String {
-            return try {
-                loadXmlFromNetwork(urls[0])
-            } catch (e: IOException) {
-                "resources.getString(R.string.connection_error)"
-            } catch (e: XmlPullParserException) {
-                "resources.getString(R.string.xml_error)"
-            }
-        }
-
-        override fun onPostExecute(result: String) {
-            val s1 = SourceEntity(
-                name = result,
+    private fun downloadXmlTask(url: String) {
+        var new = SourceEntity(0, "", "")
+        val t = Thread {
+            val name = loadXmlFromNetwork(url)
+            new = SourceEntity(
+                name = name,
                 url = viewOtherSourceBar.findViewById<TextInputEditText>(R.id.tiBar).text.toString()
             )
-            Thread {
-                DatabaseApplication.database.dao().addSource(s1)
-            }.start()
-            sourceAdapter.add(s1)
+            DatabaseApplication.database.dao().addSource(new)
         }
-
+        t.start()
+        t.join()
+        sourceAdapter.add(new)
     }
 
     @Throws(XmlPullParserException::class, IOException::class)
