@@ -8,53 +8,58 @@
     app:cardElevation="@dimen/card_elevation"
     app:cardCornerRadius="@dimen/corner_radius">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="@dimen/common_min">
+        android:background="?android:selectableItemBackground">
 
-        <TextView
-            android:id="@+id/tvTitle"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/common_default"
-            android:textStyle="bold"
-            android:maxLines="3"
-            android:ellipsize="end"
-            android:textColor="@color/black"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:text="Preocupa a porteños posible llegada de cientos de migrantes mmmmm mmmm mmmm Preocupa a porteños posible llegada de cientos de migrantes mmmmm mmmm mmmm"/>
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/common_min">
 
-        <TextView
-            android:id="@+id/tvSource"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/gray"
-            app:layout_constraintStart_toStartOf="@id/tvTitle"
-            app:layout_constraintTop_toBottomOf="@id/tvTitle"
-            tools:text="Forbes Mexico" />
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/common_default"
+                android:textStyle="bold"
+                android:maxLines="3"
+                android:ellipsize="end"
+                android:textColor="@color/black"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:text="Preocupa a porteños posible llegada de cientos de migrantes mmmmm mmmm mmmm Preocupa a porteños posible llegada de cientos de migrantes mmmmm mmmm mmmm"/>
 
-        <TextView
-            android:id="@+id/tvSlash"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=" / "
-            android:textColor="@color/gray"
-            app:layout_constraintStart_toEndOf="@id/tvSource"
-            app:layout_constraintTop_toTopOf="@id/tvSource"
-            />
+            <TextView
+                android:id="@+id/tvSource"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/gray"
+                app:layout_constraintStart_toStartOf="@id/tvTitle"
+                app:layout_constraintTop_toBottomOf="@id/tvTitle"
+                tools:text="Forbes Mexico" />
 
-        <TextView
-            android:id="@+id/tvHour"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/gray"
-            app:layout_constraintStart_toEndOf="@id/tvSlash"
-            app:layout_constraintTop_toTopOf="@id/tvSlash"
-            tools:text="3h" />
+            <TextView
+                android:id="@+id/tvSlash"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" / "
+                android:textColor="@color/gray"
+                app:layout_constraintStart_toEndOf="@id/tvSource"
+                app:layout_constraintTop_toTopOf="@id/tvSource"
+                />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/tvHour"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/gray"
+                app:layout_constraintStart_toEndOf="@id/tvSlash"
+                app:layout_constraintTop_toTopOf="@id/tvSlash"
+                tools:text="3h" />
 
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </androidx.cardview.widget.CardView>

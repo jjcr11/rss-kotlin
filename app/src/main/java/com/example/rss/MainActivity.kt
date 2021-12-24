@@ -6,6 +6,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rss.databinding.ActivityMainBinding
@@ -15,7 +16,7 @@ import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var feedAdapter: FeedAdapter
@@ -29,7 +30,7 @@ class MainActivity : AppCompatActivity() {
         //Hide the action bar by default
         supportActionBar?.hide()
 
-        feedAdapter = FeedAdapter(mutableListOf(), mutableListOf())
+        feedAdapter = FeedAdapter(mutableListOf(), mutableListOf(), this)
 
         linearLayoutManager = LinearLayoutManager(this)
 
@@ -135,5 +136,9 @@ class MainActivity : AppCompatActivity() {
         t.join()
         feedAdapter.setFeeds(feeds)
         feedAdapter.setSources(sources)
+    }
+
+    override fun onClick(feed: FeedEntity) {
+        Toast.makeText(this, feed.id.toString(), Toast.LENGTH_SHORT).show()
     }
 }
