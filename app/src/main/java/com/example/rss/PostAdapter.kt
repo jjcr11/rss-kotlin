@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.example.rss.databinding.PostItemBinding
+import org.jsoup.Jsoup
 
 class PostAdapter(private var posts: MutableList<FeedEntity>): RecyclerView.Adapter<PostAdapter.ViewHolder>() {
 
@@ -25,8 +26,27 @@ class PostAdapter(private var posts: MutableList<FeedEntity>): RecyclerView.Adap
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val post = posts[position]
         with(holder) {
-            binding.tv.text = post.title
+            var body = Jsoup.parse(post.content)
+            var head = body.head()
+            head.append(
+                """
+                <style>
+                    img {
+                        zoom: 10%
+                    }
+                </style>
+                """.trimIndent()
+            )
+            binding.tvTitle.text = post.title
+            binding.tvSource.text = post.sourceId.toString()
+            binding.tvAuthor.text = post.author
+            binding.wv.loadData(body.html(), "text/html", null)
         }
+
+        /*val post = posts[position]
+        with(holder) {
+            binding.tv.text = post.title
+        }*/
     }
 
     override fun getItemCount(): Int {
