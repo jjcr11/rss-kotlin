@@ -3,6 +3,7 @@ package com.example.rss
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import java.io.Serializable
 import java.util.*
 
 //Data class to be used by FeedAdapter
@@ -13,4 +14,4 @@ data class FeedEntity(@PrimaryKey(autoGenerate = true) var id: Int = 0,
                       var author: String?,
                       var date: Date?,
                       var content: String,
-                      var sourceId: Int)
+                      var sourceId: Int): Serializable

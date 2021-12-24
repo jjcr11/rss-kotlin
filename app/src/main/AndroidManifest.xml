@@ -15,6 +15,9 @@
         android:theme="@style/Theme.Rss"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".PostActivity"
+            android:exported="false" />
+        <activity
             android:name=".SourceActivity"
             android:exported="false" />
         <activity

@@ -13,6 +13,7 @@ import com.example.rss.databinding.ActivityMainBinding
 import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
 import java.io.InputStream
+import java.io.Serializable
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -138,7 +139,11 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         feedAdapter.setSources(sources)
     }
 
-    override fun onClick(feed: FeedEntity) {
-        Toast.makeText(this, feed.id.toString(), Toast.LENGTH_SHORT).show()
+    override fun onClick(feed: FeedEntity, position: Int) {
+        //Toast.makeText(this, position.toString(), Toast.LENGTH_SHORT).show()
+        val postActivity = Intent(this, PostActivity::class.java)
+        postActivity.putExtra("list", feedAdapter.getFeeds() as Serializable)
+        postActivity.putExtra("position", position)
+        startActivity(postActivity)
     }
 }

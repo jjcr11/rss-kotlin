@@ -19,9 +19,9 @@ class FeedAdapter(
 
     inner class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
         val binding = HeadlineItemBinding.bind(view)
-        fun setListener(feed: FeedEntity) {
+        fun setListener(feed: FeedEntity, position: Int) {
             binding.root.setOnClickListener {
-                listener.onClick(feed)
+                listener.onClick(feed, position)
             }
         }
     }
@@ -36,7 +36,7 @@ class FeedAdapter(
         val feed = feeds[position]
         val source = sources[position]
         with(holder) {
-            setListener(feed)
+            setListener(feed, position)
             binding.tvTitle.text = feed.title
             binding.tvSource.text = source
             binding.tvHour.text = feed.date.toString()
@@ -55,6 +55,10 @@ class FeedAdapter(
     fun setFeeds(feeds: MutableList<FeedEntity>) {
         this.feeds = feeds
         notifyDataSetChanged()
+    }
+
+    fun getFeeds(): MutableList<FeedEntity> {
+        return feeds
     }
 
     fun setSources(sources: MutableList<String>) {
