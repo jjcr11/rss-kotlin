@@ -1,10 +1,16 @@
 package com.example.rss
 
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.Button
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.example.rss.databinding.ActivityPostBinding
+import com.google.android.material.button.MaterialButton
+import java.util.zip.Inflater
 
 class PostActivity : AppCompatActivity() {
 
@@ -16,6 +22,12 @@ class PostActivity : AppCompatActivity() {
         binding = ActivityPostBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        /*var v = layoutInflater.inflate(R.layout.post_item, null)
+        val v2 = v.findViewById<MaterialButton>(R.id.btnShare)
+        v2.text = "FSFDSFDS"
+        Log.d("BUTTON", v2.text.toString())*/
+
+
         supportActionBar?.hide()
 
         val list: MutableList<FeedEntity> = intent.getSerializableExtra("list") as MutableList<FeedEntity>
@@ -25,14 +37,26 @@ class PostActivity : AppCompatActivity() {
 
         binding.vp.apply {
             adapter = postAdapter
+            currentItem = position
+            reduceDragSensitivity()
         }
 
-        binding.vp.currentItem = position
+        binding.vp.setPageTransformer { page, position ->
+            Thread {
+                DatabaseApplication.database.dao().setRead(list[binding.vp.currentItem].id, true)
+            }.start()
+            //Log.d("FEED", list[binding.vp.currentItem].id.toString())
+        }
 
-        binding.vp.reduceDragSensitivity()
+
+        //binding.vp.currentItem = position
+
+        //binding.vp.reduceDragSensitivity()
+
+
+
 
     }
-
 }
 
 private fun ViewPager2.reduceDragSensitivity(f: Int = 4) {

@@ -14,4 +14,5 @@ data class FeedEntity(@PrimaryKey(autoGenerate = true) var id: Int = 0,
                       var author: String?,
                       var date: Date?,
                       var content: String,
-                      var sourceId: Int): Serializable
+                      var sourceId: Int,
+                      var readed: Boolean = false): Serializable

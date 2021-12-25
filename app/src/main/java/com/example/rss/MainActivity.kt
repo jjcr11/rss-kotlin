@@ -126,7 +126,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         var feeds: MutableList<FeedEntity> = mutableListOf()
         val sources: MutableList<String> = mutableListOf()
         val t = Thread {
-            feeds = DatabaseApplication.database.dao().getFeeds()
+            feeds = DatabaseApplication.database.dao().getUnreadFeeds()
             for(feed: FeedEntity in feeds) {
                 sources.add(
                     DatabaseApplication.database.dao().getSourceNameByID(feed.sourceId)
