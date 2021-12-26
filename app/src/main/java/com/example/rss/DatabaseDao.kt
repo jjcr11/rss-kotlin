@@ -33,4 +33,7 @@ interface DatabaseDao {
 
     @Query("UPDATE FeedEntity set readed = :readed WHERE id = :id")
     fun setRead(id: Int, readed: Boolean)
+
+    @Query("SELECT url FROM FeedEntity WHERE id = :id")
+    fun getFeedURL(id: Int): String
 }

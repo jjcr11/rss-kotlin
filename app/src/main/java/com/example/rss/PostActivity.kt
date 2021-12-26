@@ -1,11 +1,14 @@
 package com.example.rss
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.example.rss.databinding.ActivityPostBinding
@@ -42,20 +45,39 @@ class PostActivity : AppCompatActivity() {
         }
 
         binding.vp.setPageTransformer { page, position ->
-            Thread {
+            var url = ""
+            val t1 = Thread {
                 DatabaseApplication.database.dao().setRead(list[binding.vp.currentItem].id, true)
-            }.start()
-            //Log.d("FEED", list[binding.vp.currentItem].id.toString())
+
+            }
+            t1.start()
+            t1.join()
+            binding.mtb.menu.getItem(1).setOnMenuItemClickListener {
+                val t2 = Thread {
+                    url = DatabaseApplication.database.dao().getFeedURL(list[binding.vp.currentItem].id)
+                }
+                t2.start()
+                t2.join()
+                val sendIntent: Intent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, "$url")
+                    type = "text/plain"
+                }
+                val shareIntent = Intent.createChooser(sendIntent, null)
+                startActivity(shareIntent)
+                true
+            }
+            binding.mtb.menu.getItem(0).setOnMenuItemClickListener {
+                val t2 = Thread {
+                    url = DatabaseApplication.database.dao().getFeedURL(list[binding.vp.currentItem].id)
+                }
+                t2.start()
+                t2.join()
+                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("$url"))
+                startActivity(browserIntent)
+                true
+            }
         }
-
-
-        //binding.vp.currentItem = position
-
-        //binding.vp.reduceDragSensitivity()
-
-
-
-
     }
 }
 

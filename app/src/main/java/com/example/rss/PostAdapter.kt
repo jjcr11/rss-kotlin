@@ -26,8 +26,10 @@ class PostAdapter(private var posts: MutableList<FeedEntity>): RecyclerView.Adap
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val post = posts[position]
         with(holder) {
-            var body = Jsoup.parse(post.content)
-            var head = body.head()
+            val body = Jsoup.parse("<h1>${post.title}</h1>")
+            body.append("<div>${post.sourceId} / ${post.author}</div>")
+            body.append(post.content)
+            val head = body.head()
             head.append(
                 """
                 <style>
@@ -37,9 +39,6 @@ class PostAdapter(private var posts: MutableList<FeedEntity>): RecyclerView.Adap
                 </style>
                 """.trimIndent()
             )
-            binding.tvTitle.text = post.title
-            binding.tvSource.text = post.sourceId.toString()
-            binding.tvAuthor.text = post.author
             binding.wv.loadData(body.html(), "text/html", null)
         }
 
