@@ -1,6 +1,7 @@
 package com.example.rss
 
 import android.content.Context
+import android.view.FrameMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,9 +10,14 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.rss.databinding.PostItemBinding
 import org.jsoup.Jsoup
 
-class PostAdapter(private var posts: MutableList<FeedEntity>): RecyclerView.Adapter<PostAdapter.ViewHolder>() {
+class PostAdapter(
+    private var posts: MutableList<FeedEntity>,
+    private val metrics: Map<String, Int>,
+): RecyclerView.Adapter<PostAdapter.ViewHolder>() {
 
     private lateinit var context: Context
+    private val height = metrics["height"]
+    private val width = metrics["width"]
 
     inner class ViewHolder(view: View):RecyclerView.ViewHolder(view) {
         val binding = PostItemBinding.bind(view)
@@ -33,8 +39,18 @@ class PostAdapter(private var posts: MutableList<FeedEntity>): RecyclerView.Adap
             head.append(
                 """
                 <style>
+                    * {
+                        text-align: justify;
+                        line-height : 24px;
+                    }
+                    h1 {
+                        font-size: 24px;
+                    }
+                    a:link {
+                        color: rgb(119, 216, 236);
+                    }
                     img {
-                        zoom: 10%
+                        zoom: 25%;
                     }
                 </style>
                 """.trimIndent()

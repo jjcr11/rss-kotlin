@@ -14,6 +14,10 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.rss.databinding.ActivityPostBinding
 import com.google.android.material.button.MaterialButton
 import java.util.zip.Inflater
+import android.util.DisplayMetrics
+
+
+
 
 class PostActivity : AppCompatActivity() {
 
@@ -25,18 +29,16 @@ class PostActivity : AppCompatActivity() {
         binding = ActivityPostBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        /*var v = layoutInflater.inflate(R.layout.post_item, null)
-        val v2 = v.findViewById<MaterialButton>(R.id.btnShare)
-        v2.text = "FSFDSFDS"
-        Log.d("BUTTON", v2.text.toString())*/
-
+        val displayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
+        val metrics = mapOf("height" to displayMetrics.heightPixels, "width" to displayMetrics.widthPixels)
 
         supportActionBar?.hide()
 
         val list: MutableList<FeedEntity> = intent.getSerializableExtra("list") as MutableList<FeedEntity>
         val position: Int = intent.getIntExtra("position", 0)
 
-        postAdapter = PostAdapter(list)
+        postAdapter = PostAdapter(list, metrics)
 
         binding.vp.apply {
             adapter = postAdapter
@@ -81,6 +83,9 @@ class PostActivity : AppCompatActivity() {
     }
 }
 
+//-------------------------------------------------------------------------------------------------------------
+//Code from https://al-e-shevelev.medium.com/how-to-reduce-scroll-sensitivity-of-viewpager2-widget-87797ad02414
+//-------------------------------------------------------------------------------------------------------------
 private fun ViewPager2.reduceDragSensitivity(f: Int = 4) {
     val recyclerViewField = ViewPager2::class.java.getDeclaredField("mRecyclerView")
     recyclerViewField.isAccessible = true
@@ -89,5 +94,5 @@ private fun ViewPager2.reduceDragSensitivity(f: Int = 4) {
     val touchSlopField = RecyclerView::class.java.getDeclaredField("mTouchSlop")
     touchSlopField.isAccessible = true
     val touchSlop = touchSlopField.get(recyclerView) as Int
-    touchSlopField.set(recyclerView, touchSlop*f)       // "8" was obtained experimentally
+    touchSlopField.set(recyclerView, touchSlop*f)
 }
