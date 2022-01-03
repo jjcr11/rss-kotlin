@@ -88,19 +88,13 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         var feeds: List<FeedEntity> = mutableListOf()
         val t = Thread {
             feeds = loadXmlFromNetwork(url, id)
-            for(feed: FeedEntity in feeds) {
-                try {
-                    DatabaseApplication.database.dao().addFeed(feed)
-                } catch (e: SQLiteConstraintException) {
-                    Log.d("TITLE: ", e.toString())
-                }
+            try {
+                DatabaseApplication.database.dao().addFeed(feeds)
+            } catch (e: SQLiteConstraintException) {
+                Log.d("TITLE: ", e.toString())
             }
         }
         t.start()
-        t.join()
-        //for(feed: FeedEntity in feeds) {
-        //    feedAdapter.add(feed)
-        //}
     }
 
     @Throws(XmlPullParserException::class, IOException::class)

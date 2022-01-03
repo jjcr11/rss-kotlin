@@ -1,6 +1,7 @@
 package com.example.rss
 
 import android.content.Context
+import android.util.Log
 import android.view.FrameMetrics
 import android.view.LayoutInflater
 import android.view.View
@@ -31,10 +32,12 @@ class PostAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val post = posts[position]
+        val r = Regex("style *= *\".*\"")
         with(holder) {
             val body = Jsoup.parse("<h1>${post.title}</h1>")
             body.append("<div>${post.sourceId} / ${post.author}</div>")
-            body.append(post.content)
+            val post2 = post.content.replace(r, "")
+            body.append(post2)
             val head = body.head()
             head.append(
                 """
@@ -55,13 +58,9 @@ class PostAdapter(
                 </style>
                 """.trimIndent()
             )
+            binding.wv.settings.javaScriptEnabled = true
             binding.wv.loadData(body.html(), "text/html", null)
         }
-
-        /*val post = posts[position]
-        with(holder) {
-            binding.tv.text = post.title
-        }*/
     }
 
     override fun getItemCount(): Int {
