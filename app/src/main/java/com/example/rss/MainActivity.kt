@@ -30,6 +30,20 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        Thread {
+            try {
+                var sources = DatabaseApplication.database.dao().getSources()
+                for(source in sources) {
+                    var fifteen = DatabaseApplication.database.dao().getFifteenthFeed(source.id)
+                    if(fifteen.size > 15) {
+                        DatabaseApplication.database.dao().deleteOldFeeds(fifteen[0], true)
+                    }
+                }
+            } catch (e: SQLiteConstraintException) {
+                Log.d("EXCEPTION", e.toString())
+            }
+        }.start()
+
         //Hide the action bar by default
         supportActionBar?.hide()
 
