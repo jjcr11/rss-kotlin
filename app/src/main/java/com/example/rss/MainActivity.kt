@@ -6,8 +6,10 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rss.databinding.ActivityMainBinding
@@ -73,6 +75,10 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         binding.fabe.setOnClickListener {
             val sourceActivity = Intent(this, SourceActivity::class.java)
             startActivity(sourceActivity)
+        }
+
+        binding.mtb.setNavigationOnClickListener {
+            binding.dl.openDrawer(GravityCompat.START)
         }
 
 
