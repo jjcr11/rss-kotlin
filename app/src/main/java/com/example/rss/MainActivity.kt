@@ -81,6 +81,12 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
             binding.dl.openDrawer(GravityCompat.START)
         }
 
+        binding.nv.menu.getItem(0).setOnMenuItemClickListener {
+            val settingsActivity = Intent(this, SettingsActivity::class.java)
+            startActivity(settingsActivity)
+            true
+        }
+
 
     }
 

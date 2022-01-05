@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SettingsActivity"
+    android:layout_margin="@dimen/common_min">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/tvTypography"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Typography"
+            android:textColor="@color/black"
+            android:textSize="@dimen/common_default"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <RadioGroup
+            android:id="@+id/rgTypography"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checkedButton="@id/rbRoboto"
+            app:layout_constraintStart_toStartOf="@id/tvTypography"
+            app:layout_constraintTop_toBottomOf="@id/tvTypography">
+
+            <RadioButton
+                android:id="@+id/rbRoboto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Roboto (default)"/>
+            <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="2"/>
+            <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="3"/>
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/tvSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Size"
+            android:textColor="@color/black"
+            android:textSize="@dimen/common_default"
+            app:layout_constraintStart_toStartOf="@id/rgTypography"
+            app:layout_constraintTop_toBottomOf="@id/rgTypography"/>
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/sSize"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@id/tvSize"
+            app:layout_constraintTop_toBottomOf="@id/tvSize"
+            android:valueFrom="24.0"
+            android:valueTo="100.0"
+            android:stepSize="1"
+            app:labelBehavior="withinBounds"/>
+
+        <WebView
+            android:id="@+id/wvLorem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@id/sSize"
+            app:layout_constraintTop_toBottomOf="@id/sSize"/>
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/sCornerRadius"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@id/wvLorem"
+            app:layout_constraintTop_toBottomOf="@id/wvLorem"
+            android:valueFrom="0.0"
+            android:valueTo="100.0"
+            android:stepSize="1"
+            app:labelBehavior="withinBounds"/>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@id/sCornerRadius"
+            app:layout_constraintTop_toBottomOf="@id/sCornerRadius"
+            app:cardCornerRadius="0dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/common_min">
+
+                <TextView
+                    android:id="@+id/tvTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/common_default"
+                    android:textStyle="bold"
+                    android:maxLines="3"
+                    android:ellipsize="end"
+                    android:textColor="@color/black"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:text="Preocupa a porteños posible llegada de cientos de migrantes mmmmm mmmm mmmm Preocupa a porteños posible llegada de cientos de migrantes mmmmm mmmm mmmm"/>
+
+                <TextView
+                    android:id="@+id/tvSource"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/gray"
+                    app:layout_constraintStart_toStartOf="@id/tvTitle"
+                    app:layout_constraintTop_toBottomOf="@id/tvTitle"
+                    android:text="Forbes Mexico" />
+
+                <TextView
+                    android:id="@+id/tvSlash"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" / "
+                    android:textColor="@color/gray"
+                    app:layout_constraintStart_toEndOf="@id/tvSource"
+                    app:layout_constraintTop_toTopOf="@id/tvSource"
+                    />
+
+                <TextView
+                    android:id="@+id/tvHour"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/gray"
+                    app:layout_constraintStart_toEndOf="@id/tvSlash"
+                    app:layout_constraintTop_toTopOf="@id/tvSlash"
+                    tools:text="3h" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <RadioGroup
+            android:id="@+id/rgTheme"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checkedButton="@id/rbLight"
+            app:layout_constraintStart_toStartOf="@id/cv"
+            app:layout_constraintTop_toBottomOf="@id/cv">
+
+            <RadioButton
+                android:id="@+id/rbLight"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Light theme"/>
+            <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Dark theme"/>
+            <RadioButton
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="System"/>
+        </RadioGroup>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
