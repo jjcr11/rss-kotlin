@@ -14,6 +14,7 @@ import org.jsoup.Jsoup
 class PostAdapter(
     private var posts: MutableList<FeedEntity>,
     private val metrics: Map<String, Int>,
+    private var size: Int
 ): RecyclerView.Adapter<PostAdapter.ViewHolder>() {
 
     private lateinit var context: Context
@@ -44,10 +45,11 @@ class PostAdapter(
                 <style>
                     * {
                         text-align: justify;
-                        line-height : 24px;
+                        line-height: 24px;
+                        font-size: ${size - 8};
                     }
                     h1 {
-                        font-size: 24px;
+                        font-size: ${size}px;
                     }
                     a:link {
                         color: rgb(119, 216, 236);

@@ -1,5 +1,6 @@
 package com.example.rss
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -38,7 +39,8 @@ class PostActivity : AppCompatActivity() {
         val list: MutableList<FeedEntity> = intent.getSerializableExtra("list") as MutableList<FeedEntity>
         val position: Int = intent.getIntExtra("position", 0)
 
-        postAdapter = PostAdapter(list, metrics)
+        val sharedPreference = getSharedPreferences("settings",Context.MODE_PRIVATE)
+        postAdapter = PostAdapter(list, metrics, sharedPreference.getInt("size", 24))
 
         binding.vp.apply {
             adapter = postAdapter

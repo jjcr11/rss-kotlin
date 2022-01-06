@@ -11,6 +11,7 @@ import com.example.rss.databinding.FeedItemBinding
 class FeedAdapter(
     private var feeds: MutableList<FeedEntity>,
     private var sources: MutableList<String>,
+    private var cornerRadius: Int,
     private val listener: FeedAdapterOnClickListener
     ): RecyclerView.Adapter<FeedAdapter.ViewHolder>() {
 
@@ -39,6 +40,7 @@ class FeedAdapter(
             binding.tvTitle.text = feed.title
             binding.tvSource.text = source
             binding.tvHour.text = feed.date.toString()
+            binding.cv.radius = cornerRadius.toFloat()
         }
     }
 

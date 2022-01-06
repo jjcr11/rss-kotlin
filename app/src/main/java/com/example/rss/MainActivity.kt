@@ -1,5 +1,6 @@
 package com.example.rss
 
+import android.content.Context
 import android.content.Intent
 import android.database.sqlite.SQLiteConstraintException
 import android.os.Build
@@ -49,7 +50,9 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         //Hide the action bar by default
         supportActionBar?.hide()
 
-        feedAdapter = FeedAdapter(mutableListOf(), mutableListOf(), this)
+        val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
+        sharedPreference.getInt("cornerRadius", 0)
+        feedAdapter = FeedAdapter(mutableListOf(), mutableListOf(), sharedPreference.getInt("cornerRadius", 0), this)
 
         linearLayoutManager = LinearLayoutManager(this)
 
