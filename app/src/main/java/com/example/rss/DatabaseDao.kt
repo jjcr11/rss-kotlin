@@ -37,9 +37,9 @@ interface DatabaseDao {
     @Query("SELECT url FROM FeedEntity WHERE id = :id")
     fun getFeedURL(id: Int): String
 
-    @Query("SELECT id FROM FeedEntity WHERE sourceId = :id  ORDER BY id DESC LIMIT 15")
-    fun getFifteenthFeed(id: Int): MutableList<Int>
+    @Query("SELECT id FROM FeedEntity WHERE sourceId = :id and readed = ${true}")
+    fun getFeedsById(id: Int): MutableList<Int>
 
-    @Query("DELETE FROM FeedEntity WHERE id < :id and readed = :readed")
-    fun deleteOldFeeds(id: Int, readed: Boolean)
+    @Query("DELETE FROM FeedEntity WHERE id = :id")
+    fun deleteOldFeeds(id: Int)
 }
