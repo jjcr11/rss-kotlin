@@ -12,7 +12,7 @@ import com.example.rss.databinding.PostItemBinding
 import org.jsoup.Jsoup
 
 class PostAdapter(
-    private var posts: MutableList<FeedEntity>,
+    private var posts: MutableList<FullFeedEntity>,
     private val metrics: Map<String, Int>,
     private var size: Int
 ): RecyclerView.Adapter<PostAdapter.ViewHolder>() {
@@ -36,7 +36,7 @@ class PostAdapter(
         val r = Regex("style *= *\".*\"")
         with(holder) {
             val body = Jsoup.parse("<h1>${post.title}</h1>")
-            body.append("<div>${post.sourceId} / ${post.author}</div>")
+            body.append("<div>${post.source} / ${post.author}</div>")
             val post2 = post.content.replace(r, "")
             body.append(post2)
             val head = body.head()

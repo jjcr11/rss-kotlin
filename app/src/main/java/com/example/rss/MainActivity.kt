@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        Thread {
+        /*Thread {
             try {
                 var sources = DatabaseApplication.database.dao().getSources()
                 for(source in sources) {
@@ -45,16 +45,19 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
             } catch (e: SQLiteConstraintException) {
                 Log.d("EXCEPTION", e.toString())
             }
-        }.start()
+        }.start()*/
 
         //Hide the action bar by default
         supportActionBar?.hide()
 
         val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
         sharedPreference.getInt("cornerRadius", 0)
-        feedAdapter = FeedAdapter(mutableListOf(), mutableListOf(), sharedPreference.getInt("cornerRadius", 0), this)
+        feedAdapter = FeedAdapter(mutableListOf(), sharedPreference.getInt("cornerRadius", 0), this)
 
         linearLayoutManager = LinearLayoutManager(this)
+
+        getData()
+        getFeeds()
 
         binding.rv.apply {
             layoutManager = linearLayoutManager
@@ -93,37 +96,28 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
 
     }
 
-    override fun onResume() {
-        super.onResume()
-        getData()
-        getFeeds()
-    }
-
     private fun getData() {
         var sources: MutableList<SourceEntity> = mutableListOf()
         val t = Thread {
             sources = DatabaseApplication.database.dao().getSources()
+            if(sources.size > 0) {
+                for(source: SourceEntity in sources) {
+                    downloadXmlTask(source.url, source.id)
+                }
+            }
         }
         t.start()
         t.join()
-        if(sources.size > 0) {
-            for(source: SourceEntity in sources) {
-                downloadXmlTask(source.url, source.id)
-            }
-        }
     }
 
     private fun downloadXmlTask(url: String?, id: Int) {
         var feeds: List<FeedEntity> = mutableListOf()
-        val t = Thread {
-            feeds = loadXmlFromNetwork(url, id)
-            try {
-                DatabaseApplication.database.dao().addFeed(feeds)
-            } catch (e: SQLiteConstraintException) {
-                Log.d("TITLE: ", e.toString())
-            }
+        feeds = loadXmlFromNetwork(url, id)
+        try {
+            DatabaseApplication.database.dao().addFeed(feeds)
+        } catch (e: SQLiteConstraintException) {
+            Log.d("TITLE: ", e.toString())
         }
-        t.start()
     }
 
     @Throws(XmlPullParserException::class, IOException::class)
@@ -148,23 +142,17 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
     }
 
     private fun getFeeds() {
-        var feeds: MutableList<FeedEntity> = mutableListOf()
-        val sources: MutableList<String> = mutableListOf()
+        var feeds: MutableList<FullFeedEntity> = mutableListOf()
         val t = Thread {
             feeds = DatabaseApplication.database.dao().getUnreadFeeds()
-            for(feed: FeedEntity in feeds) {
-                sources.add(
-                    DatabaseApplication.database.dao().getSourceNameByID(feed.sourceId)
-                )
-            }
+
         }
         t.start()
         t.join()
         feedAdapter.setFeeds(feeds)
-        feedAdapter.setSources(sources)
     }
 
-    override fun onClick(feed: FeedEntity, position: Int) {
+    override fun onClick(feed: FullFeedEntity, position: Int) {
         //Toast.makeText(this, position.toString(), Toast.LENGTH_SHORT).show()
         val postActivity = Intent(this, PostActivity::class.java)
         postActivity.putExtra("list", feedAdapter.getFeeds() as Serializable)

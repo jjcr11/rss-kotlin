@@ -9,8 +9,7 @@ import com.example.rss.databinding.FeedItemBinding
 
 //Adapter to be used by the cards from headline_item.xml
 class FeedAdapter(
-    private var feeds: MutableList<FeedEntity>,
-    private var sources: MutableList<String>,
+    private var feeds: MutableList<FullFeedEntity>,
     private var cornerRadius: Int,
     private val listener: FeedAdapterOnClickListener
     ): RecyclerView.Adapter<FeedAdapter.ViewHolder>() {
@@ -19,7 +18,7 @@ class FeedAdapter(
 
     inner class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
         val binding = FeedItemBinding.bind(view)
-        fun setListener(feed: FeedEntity, position: Int) {
+        fun setListener(feed: FullFeedEntity, position: Int) {
             binding.root.setOnClickListener {
                 listener.onClick(feed, position)
             }
@@ -34,11 +33,10 @@ class FeedAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val feed = feeds[position]
-        val source = sources[position]
         with(holder) {
             setListener(feed, position)
             binding.tvTitle.text = feed.title
-            binding.tvSource.text = source
+            binding.tvSource.text = feed.source
             binding.tvHour.text = feed.date.toString()
             binding.cv.radius = cornerRadius.toFloat()
         }
@@ -48,22 +46,17 @@ class FeedAdapter(
         return feeds.size
     }
 
-    fun add(feedEntity: FeedEntity) {
+    fun add(feedEntity: FullFeedEntity) {
         feeds.add(feedEntity)
         notifyDataSetChanged()
     }
 
-    fun setFeeds(feeds: MutableList<FeedEntity>) {
+    fun setFeeds(feeds: MutableList<FullFeedEntity>) {
         this.feeds = feeds
         notifyDataSetChanged()
     }
 
-    fun getFeeds(): MutableList<FeedEntity> {
+    fun getFeeds(): MutableList<FullFeedEntity> {
         return feeds
-    }
-
-    fun setSources(sources: MutableList<String>) {
-        this.sources = sources
-        notifyDataSetChanged()
     }
 }

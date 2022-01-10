@@ -36,7 +36,7 @@ class PostActivity : AppCompatActivity() {
 
         supportActionBar?.hide()
 
-        val list: MutableList<FeedEntity> = intent.getSerializableExtra("list") as MutableList<FeedEntity>
+        val list: MutableList<FullFeedEntity> = intent.getSerializableExtra("list") as MutableList<FullFeedEntity>
         val position: Int = intent.getIntExtra("position", 0)
 
         val sharedPreference = getSharedPreferences("settings",Context.MODE_PRIVATE)

@@ -19,8 +19,8 @@ interface DatabaseDao {
     @Query("SELECT * FROM FeedEntity")
     fun getFeeds(): MutableList<FeedEntity>
 
-    @Query("SELECT * FROM FeedEntity WHERE readed = ${false}")
-    fun getUnreadFeeds(): MutableList<FeedEntity>
+    @Query("SELECT FeedEntity.id, title, name as source, date, author, content FROM FeedEntity INNER JOIN SourceEntity ON FeedEntity.sourceId = SourceEntity.id  WHERE FeedEntity.readed = ${false} ORDER BY date LIMIT 50")
+    fun getUnreadFeeds(): MutableList<FullFeedEntity>
 
     @Insert
     fun addFeed(feedEntity: List<FeedEntity>)
