@@ -37,7 +37,7 @@ interface DatabaseDao {
     @Query("SELECT url FROM FeedEntity WHERE id = :id")
     fun getFeedURL(id: Int): String
 
-    @Query("SELECT id FROM FeedEntity WHERE sourceId = :id and readed = ${true}")
+    @Query("SELECT id FROM FeedEntity WHERE sourceId = :id and readed = ${true} and saved = ${false}")
     fun getFeedsById(id: Int): MutableList<Int>
 
     @Query("DELETE FROM FeedEntity WHERE id = :id")
@@ -48,4 +48,7 @@ interface DatabaseDao {
 
     @Query("SELECT saved FROM FeedEntity where id = :id")
     fun getSaved(id: Int): Boolean
+
+    @Query("SELECT FeedEntity.id, title, name as source, date, author, content FROM FeedEntity INNER JOIN SourceEntity ON FeedEntity.sourceId = SourceEntity.id  WHERE FeedEntity.saved = ${true} ORDER BY date LIMIT 50")
+    fun getSavedFeeds(): MutableList<FullFeedEntity>
 }

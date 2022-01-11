@@ -20,7 +20,7 @@ class SettingsActivity : AppCompatActivity() {
 
         val sharedPreference = getSharedPreferences("settings",Context.MODE_PRIVATE)
         binding.sSize.value = sharedPreference.getInt("size", 24).toFloat()
-        binding.sCornerRadius.value = sharedPreference.getInt("cornerRadius", 24).toFloat()
+        binding.sCornerRadius.value = sharedPreference.getInt("cornerRadius", 0).toFloat()
         binding.cv.radius = binding.sCornerRadius.value
 
         val body = Jsoup.parse("<h1>Title</h1>")

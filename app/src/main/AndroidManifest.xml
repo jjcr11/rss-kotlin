@@ -15,6 +15,9 @@
         android:theme="@style/Theme.Rss"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".SavedActivity"
+            android:exported="false" />
+        <activity
             android:name=".SettingsActivity"
             android:exported="false" />
         <activity

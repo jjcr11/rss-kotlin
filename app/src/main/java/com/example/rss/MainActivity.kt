@@ -99,6 +99,12 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
             true
         }
 
+        binding.nv.menu.getItem(1).setOnMenuItemClickListener {
+            val savedActivity = Intent(this, SavedActivity::class.java)
+            startActivity(savedActivity)
+            true
+        }
+
 
     }
 
