@@ -34,11 +34,13 @@ class PostAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val post = posts[position]
         val r = Regex("style *= *\".*\"")
+        val r2 = Regex("#")
         with(holder) {
             val body = Jsoup.parse("<h1>${post.title}</h1>")
             body.append("<div>${post.source} / ${post.author}</div>")
             val post2 = post.content.replace(r, "")
-            body.append(post2)
+            val post3 = post2.replace(r2, "")
+            body.append(post3)
             val head = body.head()
             head.append(
                 """

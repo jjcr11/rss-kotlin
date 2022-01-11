@@ -23,7 +23,7 @@ interface DatabaseDao {
     fun getUnreadFeeds(): MutableList<FullFeedEntity>
 
     @Insert
-    fun addFeed(feedEntity: List<FeedEntity>)
+    fun addFeed(feedEntity: FeedEntity)
 
     @Query("SELECT * FROM SourceEntity")
     fun getSourcesFeed(): MutableList<SourceFeedRelation>

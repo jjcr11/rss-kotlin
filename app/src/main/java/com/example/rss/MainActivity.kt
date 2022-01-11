@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteConstraintException
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.Gravity
 import android.widget.Toast
@@ -20,6 +22,8 @@ import java.io.InputStream
 import java.io.Serializable
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.*
+import kotlin.concurrent.schedule
 
 class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
 
@@ -59,7 +63,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         linearLayoutManager = LinearLayoutManager(this)
 
         getData()
-        getFeeds()
+        //getFeeds()
 
         binding.rv.apply {
             layoutManager = linearLayoutManager
@@ -100,26 +104,30 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
 
     private fun getData() {
         var sources: MutableList<SourceEntity> = mutableListOf()
-        val t = Thread {
+        Thread {
             sources = DatabaseApplication.database.dao().getSources()
             if(sources.size > 0) {
                 for(source: SourceEntity in sources) {
                     downloadXmlTask(source.url, source.id)
                 }
             }
-        }
-        t.start()
-        t.join()
+        }.start()
+        Handler(Looper.myLooper()!!).postDelayed({
+            getFeeds()
+        }, 2000)
     }
 
     private fun downloadXmlTask(url: String?, id: Int) {
         var feeds: List<FeedEntity> = mutableListOf()
         feeds = loadXmlFromNetwork(url, id)
-        try {
-            DatabaseApplication.database.dao().addFeed(feeds)
-        } catch (e: SQLiteConstraintException) {
-            Log.d("TITLE: ", e.toString())
+        for(feed in feeds) {
+            try {
+                DatabaseApplication.database.dao().addFeed(feed)
+            } catch (e: SQLiteConstraintException) {
+                Log.d("TITLE: ", e.toString())
+            }
         }
+
     }
 
     @Throws(XmlPullParserException::class, IOException::class)
