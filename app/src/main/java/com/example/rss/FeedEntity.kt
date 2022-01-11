@@ -15,4 +15,5 @@ data class FeedEntity(@PrimaryKey(autoGenerate = true) var id: Int = 0,
                       var date: Date?,
                       var content: String,
                       var sourceId: Int,
-                      var readed: Boolean = false)
+                      var readed: Boolean = false,
+                      var saved: Boolean = false)

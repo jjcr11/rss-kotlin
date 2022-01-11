@@ -42,4 +42,10 @@ interface DatabaseDao {
 
     @Query("DELETE FROM FeedEntity WHERE id = :id")
     fun deleteOldFeeds(id: Int)
+
+    @Query("UPDATE FeedEntity set saved = :saved where id = :id")
+    fun setSaved(id: Int, saved: Boolean)
+
+    @Query("SELECT saved FROM FeedEntity where id = :id")
+    fun getSaved(id: Int): Boolean
 }

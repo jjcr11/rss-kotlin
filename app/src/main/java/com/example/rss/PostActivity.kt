@@ -2,6 +2,8 @@ package com.example.rss
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
+import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -16,8 +18,9 @@ import com.example.rss.databinding.ActivityPostBinding
 import com.google.android.material.button.MaterialButton
 import java.util.zip.Inflater
 import android.util.DisplayMetrics
-
-
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.get
 
 
 class PostActivity : AppCompatActivity() {
@@ -50,13 +53,20 @@ class PostActivity : AppCompatActivity() {
 
         binding.vp.setPageTransformer { page, position ->
             var url = ""
+            var saved = true
             val t1 = Thread {
                 DatabaseApplication.database.dao().setRead(list[binding.vp.currentItem].id, true)
-
+                saved = DatabaseApplication.database.dao().getSaved(list[binding.vp.currentItem].id)
             }
             t1.start()
             t1.join()
-            binding.mtb.menu.getItem(1).setOnMenuItemClickListener {
+            binding.mtb.menu.getItem(0).isChecked = saved
+            if(saved) {
+                binding.mtb.menu.getItem(0).icon = ContextCompat.getDrawable(this, R.drawable.ic_bookmark)
+            } else {
+                binding.mtb.menu.getItem(0).icon = ContextCompat.getDrawable(this, R.drawable.ic_bookmark_border)
+            }
+            binding.mtb.menu.getItem(2).setOnMenuItemClickListener {
                 val t2 = Thread {
                     url = DatabaseApplication.database.dao().getFeedURL(list[binding.vp.currentItem].id)
                 }
@@ -71,7 +81,7 @@ class PostActivity : AppCompatActivity() {
                 startActivity(shareIntent)
                 true
             }
-            binding.mtb.menu.getItem(0).setOnMenuItemClickListener {
+            binding.mtb.menu.getItem(1).setOnMenuItemClickListener {
                 val t2 = Thread {
                     url = DatabaseApplication.database.dao().getFeedURL(list[binding.vp.currentItem].id)
                 }
@@ -79,6 +89,22 @@ class PostActivity : AppCompatActivity() {
                 t2.join()
                 val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("$url"))
                 startActivity(browserIntent)
+                true
+            }
+
+            binding.mtb.menu.getItem(0).setOnMenuItemClickListener {
+                binding.mtb.menu.getItem(0).isChecked = !binding.mtb.menu.getItem(0).isChecked
+                val t2 = Thread {
+                    DatabaseApplication.database.dao().setSaved(list[binding.vp.currentItem].id, binding.mtb.menu.getItem(0).isChecked)
+                }
+                t2.start()
+                t2.join()
+                if(binding.mtb.menu.getItem(0).isChecked) {
+                    binding.mtb.menu.getItem(0).icon = ContextCompat.getDrawable(this, R.drawable.ic_bookmark)
+                } else {
+                    binding.mtb.menu.getItem(0).icon = ContextCompat.getDrawable(this, R.drawable.ic_bookmark_border)
+                }
+                Log.d("SAVED", binding.mtb.menu.getItem(0).isChecked.toString())
                 true
             }
         }
