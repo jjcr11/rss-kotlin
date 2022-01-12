@@ -37,7 +37,11 @@ class PostAdapter(
         val r2 = Regex("#")
         with(holder) {
             val body = Jsoup.parse("<h1>${post.title}</h1>")
-            body.append("<div>${post.source} / ${post.author}</div>")
+            if(post.author == null) {
+                body.append("<div>${post.source} / Unknown</div>")
+            } else {
+                body.append("<div>${post.source} / ${post.author}</div>")
+            }
             val post2 = post.content.replace(r, "")
             val post3 = post2.replace(r2, "")
             body.append(post3)

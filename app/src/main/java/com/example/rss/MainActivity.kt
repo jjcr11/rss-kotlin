@@ -42,10 +42,14 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
                 var sources = DatabaseApplication.database.dao().getSources()
                 for(source in sources) {
                     var feedsById = DatabaseApplication.database.dao().getFeedsById(source.id)
+                    var count = 0
                     if(feedsById.size > 25) {
-                        for(feed in feedsById) {
-                            DatabaseApplication.database.dao().deleteOldFeeds(feed)
+                        if(count > 25) {
+                            for(feed in feedsById) {
+                                DatabaseApplication.database.dao().deleteOldFeeds(feed)
+                            }
                         }
+                        count += 1
                     }
                 }
             } catch (e: SQLiteConstraintException) {
