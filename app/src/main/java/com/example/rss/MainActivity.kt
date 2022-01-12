@@ -3,6 +3,8 @@ package com.example.rss
 import android.content.Context
 import android.content.Intent
 import android.database.sqlite.SQLiteConstraintException
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -114,14 +116,21 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
 
     private fun getData() {
         var sources: MutableList<SourceEntity> = mutableListOf()
-        Thread {
-            sources = DatabaseApplication.database.dao().getSources()
-            if(sources.size > 0) {
-                for(source: SourceEntity in sources) {
-                    downloadXmlTask(source.url, source.id)
+        val cm = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
+        val isConnected: Boolean = activeNetwork?.isConnectedOrConnecting == true
+        if(isConnected) {
+            Thread {
+                sources = DatabaseApplication.database.dao().getSources()
+                if(sources.size > 0) {
+                    for(source: SourceEntity in sources) {
+                        downloadXmlTask(source.url, source.id)
+                    }
                 }
-            }
-        }.start()
+            }.start()
+        } else {
+            Toast.makeText(this, "No internet connection", Toast.LENGTH_SHORT).show()
+        }
         Handler(Looper.myLooper()!!).postDelayed({
             getFeeds()
         }, 2000)
@@ -151,6 +160,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
     @Throws(IOException::class)
     private fun downloadUrl(urlString: String?): InputStream? {
         val url = URL(urlString)
+
         return (url.openConnection() as? HttpURLConnection)?.run {
             readTimeout = 10000
             connectTimeout = 15000
