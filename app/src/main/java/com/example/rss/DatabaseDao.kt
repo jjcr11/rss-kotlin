@@ -54,4 +54,10 @@ interface DatabaseDao {
 
     @Query("DELETE FROM SourceEntity WHERE id = :id")
     fun deleteSourceById(id: Int)
+
+    @Query("SELECT * FROM FeedEntity WHERE sourceId = :id")
+    fun getAllFeedsById(id: Int): MutableList<FeedEntity>
+
+    @Delete
+    fun deleteFeeds(Feeds: MutableList<FeedEntity>)
 }

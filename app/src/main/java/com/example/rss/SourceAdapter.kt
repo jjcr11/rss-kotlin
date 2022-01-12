@@ -1,6 +1,7 @@
 package com.example.rss
 
 import android.content.Context
+import android.provider.ContactsContract
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -31,6 +32,8 @@ class SourceAdapter(private var sources: MutableList<SourceEntity>): RecyclerVie
             binding.tvUrl.text = source.url
             binding.imgDelete.setOnClickListener {
                 val t = Thread {
+                    val f = DatabaseApplication.database.dao().getAllFeedsById(source.id)
+                    DatabaseApplication.database.dao().deleteFeeds(f)
                     DatabaseApplication.database.dao().deleteSourceById(source.id)
                 }
                 t.start()
