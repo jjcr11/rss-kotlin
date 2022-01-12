@@ -51,4 +51,7 @@ interface DatabaseDao {
 
     @Query("SELECT FeedEntity.id, title, name as source, date, author, content FROM FeedEntity INNER JOIN SourceEntity ON FeedEntity.sourceId = SourceEntity.id  WHERE FeedEntity.saved = ${true} ORDER BY date LIMIT 50")
     fun getSavedFeeds(): MutableList<FullFeedEntity>
+
+    @Query("DELETE FROM SourceEntity WHERE id = :id")
+    fun deleteSourceById(id: Int)
 }

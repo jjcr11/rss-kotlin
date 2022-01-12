@@ -13,7 +13,7 @@
         android:layout_margin="@dimen/common_min">
 
         <ImageView
-            android:id="@+id/img"
+            android:id="@+id/imgRss"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_rss_feed"
@@ -30,9 +30,9 @@
             android:textSize="@dimen/common_default"
             android:textColor="@color/black"
             android:maxLines="1"
-            app:layout_constraintStart_toEndOf="@+id/img"
+            app:layout_constraintStart_toEndOf="@+id/imgRss"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/img"
+            app:layout_constraintBottom_toBottomOf="@id/imgRss"
             tools:text="Forbes Mexico"/>
 
         <TextView
@@ -44,13 +44,15 @@
             android:textColor="@color/gray"
             app:layout_constraintStart_toStartOf="@id/tvName"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="@id/img"
+            app:layout_constraintTop_toTopOf="@id/imgRss"
             tools:text="https://www.forbes.com.mx/tag/feed/"/>
 
-        <ImageView
+        <ImageButton
+            android:id="@+id/imgDelete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_delete_forever"
+            android:backgroundTint="@color/white"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>

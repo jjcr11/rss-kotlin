@@ -1,9 +1,11 @@
 package com.example.rss
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rss.databinding.SourcesItemBinding
 
@@ -27,6 +29,16 @@ class SourceAdapter(private var sources: MutableList<SourceEntity>): RecyclerVie
         with(holder) {
             binding.tvName.text = source.name
             binding.tvUrl.text = source.url
+            binding.imgDelete.setOnClickListener {
+                val t = Thread {
+                    DatabaseApplication.database.dao().deleteSourceById(source.id)
+                }
+                t.start()
+                t.join()
+                sources.remove(source)
+                notifyDataSetChanged()
+                Toast.makeText(context, "You can see the feeds from ${source.name} until close the app", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
