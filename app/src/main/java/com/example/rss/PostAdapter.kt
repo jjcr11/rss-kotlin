@@ -61,7 +61,16 @@ class PostAdapter(
                         color: rgb(119, 216, 236);
                     }
                     img {
-                        zoom: 25%;
+                        width: 100%;
+                        height: auto;
+                    }
+                    video {
+                        width: 100%;
+                        height: auto;
+                    }
+                    iframe {
+                        width: 100%;
+                        height: auto;
                     }
                 </style>
                 """.trimIndent()
