@@ -49,6 +49,13 @@
             app:iconTint="@color/black"
             app:icon="@drawable/ic_rss_feed"/>
 
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/cpi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:layout_gravity="center_vertical|center_horizontal"/>
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <com.google.android.material.navigation.NavigationView

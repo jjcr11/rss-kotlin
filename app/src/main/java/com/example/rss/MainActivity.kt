@@ -12,12 +12,14 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.Gravity
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rss.databinding.ActivityMainBinding
+import kotlinx.coroutines.*
 import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
 import java.io.InputStream
@@ -115,55 +117,63 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
     }
 
     private fun getData() {
-        var sources: MutableList<SourceEntity> = mutableListOf()
+        val sources: MutableList<SourceEntity>
         val cm = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
         val isConnected: Boolean = activeNetwork?.isConnectedOrConnecting == true
         if(isConnected) {
-            Thread {
+            runBlocking(Dispatchers.IO) {
                 sources = DatabaseApplication.database.dao().getSources()
-                if(sources.size > 0) {
-                    for(source: SourceEntity in sources) {
-                        downloadXmlTask(source.url, source.id)
-                    }
+            }
+            if(sources.size > 0) {
+                for(source: SourceEntity in sources) {
+                    //Log.d("SOURCES", source.name!!)
+                    downloadXmlTask(source.url, source.id)
                 }
-            }.start()
+            }
         } else {
             Toast.makeText(this, "No internet connection", Toast.LENGTH_SHORT).show()
         }
-        Handler(Looper.myLooper()!!).postDelayed({
+        /*Handler(Looper.myLooper()!!).postDelayed({
             getFeeds()
-        }, 2000)
+        }, 2000)*/
     }
 
     private fun downloadXmlTask(url: String?, id: Int) {
         var feeds: List<FeedEntity> = mutableListOf()
-        feeds = loadXmlFromNetwork(url, id)
-        for(feed in feeds) {
-            try {
-                DatabaseApplication.database.dao().addFeed(feed)
-            } catch (e: SQLiteConstraintException) {
-                Log.d("TITLE: ", e.toString())
+        GlobalScope.launch {
+            feeds = loadXmlFromNetwork(url, id)
+            runBlocking(Dispatchers.IO) {
+                for(feed in feeds) {
+                    try {
+                        DatabaseApplication.database.dao().addFeed(feed)
+                    } catch (e: SQLiteConstraintException) {
+                        Log.d("TITLE: ", e.toString())
+                    }
+                }
+            }
+            runBlocking(Dispatchers.Main) {
+                getFeeds()
             }
         }
-
     }
 
     @Throws(XmlPullParserException::class, IOException::class)
-    private fun loadXmlFromNetwork(urlString: String?, sourceId: Int): List<FeedEntity> {
-        val feeds: List<FeedEntity> = downloadUrl(urlString)?.use { stream ->
-            XmlParser().parse(stream, sourceId)
-        }!!
+    private suspend fun loadXmlFromNetwork(urlString: String?, sourceId: Int): List<FeedEntity> {
+        val feeds: List<FeedEntity> = withContext(Dispatchers.IO) {
+            downloadUrl(urlString)?.use { stream ->
+                XmlParser().parse(stream, sourceId)
+            }!!
+        }
         return feeds
     }
 
     @Throws(IOException::class)
     private fun downloadUrl(urlString: String?): InputStream? {
         val url = URL(urlString)
-
         return (url.openConnection() as? HttpURLConnection)?.run {
-            readTimeout = 10000
-            connectTimeout = 15000
+            readTimeout = 15000
+            connectTimeout = 20000
             requestMethod = "GET"
             doInput = true
             connect()
@@ -172,13 +182,11 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
     }
 
     private fun getFeeds() {
-        var feeds: MutableList<FullFeedEntity> = mutableListOf()
-        val t = Thread {
+        var feeds: MutableList<FullFeedEntity>
+        runBlocking(Dispatchers.IO) {
             feeds = DatabaseApplication.database.dao().getUnreadFeeds()
-
         }
-        t.start()
-        t.join()
+        binding.cpi.visibility = View.GONE
         feedAdapter.setFeeds(feeds)
     }
 

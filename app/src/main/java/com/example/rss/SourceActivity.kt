@@ -6,6 +6,7 @@ import android.transition.Scene
 import android.transition.Transition
 import android.transition.TransitionInflater
 import android.transition.TransitionManager
+import android.util.Log
 import android.view.View
 import android.widget.ImageButton
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.rss.databinding.ActivitySourcesBinding
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.*
 import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
 import java.io.InputStream
@@ -33,6 +35,8 @@ class SourceActivity : AppCompatActivity() {
 
         //Hide the action bar by default
         supportActionBar?.hide()
+
+        binding.cpi.visibility = View.GONE
 
         linearLayoutManager = LinearLayoutManager(this)
 
@@ -82,42 +86,46 @@ class SourceActivity : AppCompatActivity() {
 
     //Function to get sources into the database
     private fun getSources() {
-        var sources: MutableList<SourceEntity>
-        Thread {
-            sources = DatabaseApplication.database.dao().getSources()
+        runBlocking(Dispatchers.IO) {
+            val sources = DatabaseApplication.database.dao().getSources()
             sourceAdapter.setSources(sources)
-        }.start()
+        }
     }
 
     private fun downloadXmlTask(url: String) {
-        var new = SourceEntity(0, "", "")
-        val t = Thread {
+        binding.cpi.visibility = View.VISIBLE
+        GlobalScope.launch {
             val name = loadXmlFromNetwork(url)
-            new = SourceEntity(
+            val new = SourceEntity(
                 name = name,
                 url = viewOtherSourceBar.findViewById<TextInputEditText>(R.id.tiBar).text.toString()
             )
-            DatabaseApplication.database.dao().addSource(new)
+            runBlocking(Dispatchers.IO) {
+                DatabaseApplication.database.dao().addSource(new)
+            }
+            runBlocking(Dispatchers.Main) {
+                binding.cpi.visibility = View.GONE
+                sourceAdapter.add(new)
+            }
         }
-        t.start()
-        t.join()
-        sourceAdapter.add(new)
     }
 
     @Throws(XmlPullParserException::class, IOException::class)
-    private fun loadXmlFromNetwork(urlString: String): String {
-        val source: SourceEntity? = downloadUrl(urlString)?.use { stream ->
-            XmlParser().parse(stream)
+    private suspend fun loadXmlFromNetwork(urlString: String): String {
+        val sources = withContext(Dispatchers.IO) {
+            downloadUrl(urlString)?.use { stream ->
+                XmlParser().parse(stream)
+            }
         }
-        return source?.name.toString()
+        return sources?.name.toString()
     }
 
     @Throws(IOException::class)
     private fun downloadUrl(urlString: String): InputStream? {
         val url = URL(urlString)
         return (url.openConnection() as? HttpURLConnection)?.run {
-            readTimeout = 10000
-            connectTimeout = 15000
+            readTimeout = 15000
+            connectTimeout = 20000
             requestMethod = "GET"
             doInput = true
             connect()

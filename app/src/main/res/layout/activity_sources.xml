@@ -32,4 +32,11 @@
         tools:listitem="@layout/sources_item"
         android:elevation="0dp"/>
 
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/cpi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:layout_gravity="center_vertical|center_horizontal"/>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
