@@ -47,12 +47,10 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
                 for(source in sources) {
                     var feedsById = DatabaseApplication.database.dao().getFeedsById(source.id)
                     var count = 0
-                    if(feedsById.size > 25) {
-                        if(count > 25) {
-                            for(feed in feedsById) {
-                                DatabaseApplication.database.dao().deleteOldFeeds(feed)
-                            }
-                        }
+                    var size = feedsById.size
+                    while(size > 25) {
+                        DatabaseApplication.database.dao().deleteOldFeeds(feedsById[count])
+                        size -= 1
                         count += 1
                     }
                 }
