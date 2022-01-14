@@ -1,5 +1,7 @@
 package com.example.rss
 
+import android.content.Context
+import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.transition.Scene
@@ -9,6 +11,8 @@ import android.transition.TransitionManager
 import android.util.Log
 import android.view.View
 import android.widget.ImageButton
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rss.databinding.ActivitySourcesBinding
@@ -79,7 +83,8 @@ class SourceActivity : AppCompatActivity() {
 
         viewOtherSourceBar.findViewById<ImageButton>(R.id.imgb).setOnClickListener {
             downloadXmlTask(
-                viewOtherSourceBar.findViewById<TextInputEditText>(R.id.tiBar).text.toString()
+                viewOtherSourceBar.findViewById<TextInputEditText>(R.id.tiBar).text.toString(),
+                this
             )
         }
     }
@@ -92,22 +97,41 @@ class SourceActivity : AppCompatActivity() {
         }
     }
 
-    private fun downloadXmlTask(url: String) {
+    private fun downloadXmlTask(url: String, context: Context) {
         binding.cpi.visibility = View.VISIBLE
-        GlobalScope.launch {
-            val name = loadXmlFromNetwork(url)
-            val new = SourceEntity(
-                name = name,
-                url = viewOtherSourceBar.findViewById<TextInputEditText>(R.id.tiBar).text.toString()
-            )
-            runBlocking(Dispatchers.IO) {
-                DatabaseApplication.database.dao().addSource(new)
+
+            GlobalScope.launch {
+                try {
+                    val name = loadXmlFromNetwork(url)
+                    val new = SourceEntity(
+                        name = name,
+                        url = viewOtherSourceBar.findViewById<TextInputEditText>(R.id.tiBar).text.toString()
+                    )
+                    runBlocking(Dispatchers.IO) {
+                        DatabaseApplication.database.dao().addSource(new)
+                    }
+                    runBlocking(Dispatchers.Main) {
+                        binding.cpi.visibility = View.GONE
+                        sourceAdapter.add(new)
+                    }
+                }  catch (e: Exception) {
+                    Log.d("EXCEPTION", e.toString())
+                    runBlocking(Dispatchers.Main) {
+                        binding.cpi.visibility = View.GONE
+                        val builder = AlertDialog.Builder(context)
+                        builder.setMessage("Error with the link")
+                            .setPositiveButton("ACCEPT",
+                                DialogInterface.OnClickListener { dialog, id ->
+                                    // FIRE ZE MISSILES!
+                                })
+                        builder.create()
+                        builder.show()
+                    }
+                }
+
+
             }
-            runBlocking(Dispatchers.Main) {
-                binding.cpi.visibility = View.GONE
-                sourceAdapter.add(new)
-            }
-        }
+
     }
 
     @Throws(XmlPullParserException::class, IOException::class)
