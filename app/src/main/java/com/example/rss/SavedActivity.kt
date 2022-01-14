@@ -25,6 +25,7 @@ class SavedActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         supportActionBar?.hide()
         binding.fabe.hide()
         binding.mtb.visibility = View.GONE
+        binding.cpi.visibility = View.GONE
 
         val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
         sharedPreference.getInt("cornerRadius", 0)

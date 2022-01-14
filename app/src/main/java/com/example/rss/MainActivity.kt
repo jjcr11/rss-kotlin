@@ -41,6 +41,8 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.cpi.visibility = View.GONE
+
         Thread {
             try {
                 var sources = DatabaseApplication.database.dao().getSources()
@@ -48,7 +50,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
                     var feedsById = DatabaseApplication.database.dao().getFeedsById(source.id)
                     var count = 0
                     var size = feedsById.size
-                    while(size > 25) {
+                    while(size > 26) {
                         DatabaseApplication.database.dao().deleteOldFeeds(feedsById[count])
                         size -= 1
                         count += 1
@@ -124,6 +126,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
                 sources = DatabaseApplication.database.dao().getSources()
             }
             if(sources.size > 0) {
+                binding.cpi.visibility = View.VISIBLE
                 for(source: SourceEntity in sources) {
                     //Log.d("SOURCES", source.name!!)
                     downloadXmlTask(source.url, source.id)

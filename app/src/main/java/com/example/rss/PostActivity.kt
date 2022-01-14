@@ -33,6 +33,8 @@ class PostActivity : AppCompatActivity() {
         binding = ActivityPostBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.mtb
+
         val displayMetrics = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(displayMetrics)
         val metrics = mapOf("height" to displayMetrics.heightPixels, "width" to displayMetrics.widthPixels)

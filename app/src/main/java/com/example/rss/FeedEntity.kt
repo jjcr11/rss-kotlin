@@ -7,7 +7,7 @@ import java.io.Serializable
 import java.util.*
 
 //Data class to be used by FeedAdapter
-@Entity(tableName = "FeedEntity", indices = [Index(value = ["title"], unique = true)])
+@Entity(tableName = "FeedEntity", indices = [Index(value = ["url"], unique = true)])
 data class FeedEntity(@PrimaryKey(autoGenerate = true) var id: Int = 0,
                       var title: String,
                       var url: String,
