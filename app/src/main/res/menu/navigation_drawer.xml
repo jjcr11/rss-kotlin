@@ -9,5 +9,13 @@
             android:id="@+id/saved"
             android:icon="@drawable/ic_bookmark"
             android:title="Saved" />
+        <item
+            android:id="@+id/code"
+            android:icon="@drawable/github"
+            android:title="Source code" />
+        <item
+            android:id="@+id/donation"
+            android:icon="@drawable/ic_favorite"
+            android:title="Donate" />
     </group>
 </menu>

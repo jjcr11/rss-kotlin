@@ -5,6 +5,7 @@ import android.content.Intent
 import android.database.sqlite.SQLiteConstraintException
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
+import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -110,6 +111,18 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         binding.nv.menu.getItem(1).setOnMenuItemClickListener {
             val savedActivity = Intent(this, SavedActivity::class.java)
             startActivity(savedActivity)
+            true
+        }
+
+        binding.nv.menu.getItem(2).setOnMenuItemClickListener {
+            val codeIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/jjcr11/"))
+            startActivity(codeIntent)
+            true
+        }
+
+        binding.nv.menu.getItem(3).setOnMenuItemClickListener {
+            val donateIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.paypal.me/jjcr11"))
+            startActivity(donateIntent)
             true
         }
 
