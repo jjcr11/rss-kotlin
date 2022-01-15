@@ -76,16 +76,11 @@ class SourceActivity : AppCompatActivity() {
         }
 
         viewOtherSourceBar.findViewById<MaterialToolbar>(R.id.mtb).menu.getItem(0).setOnMenuItemClickListener {
-            TransitionManager.go(fromAppBarLayoutToViewMaterialToolBar, transition)
-            viewOtherSourceBar.findViewById<TextInputEditText>(R.id.tiBar).setText("")
-            true
-        }
-
-        viewOtherSourceBar.findViewById<ImageButton>(R.id.imgb).setOnClickListener {
             downloadXmlTask(
                 viewOtherSourceBar.findViewById<TextInputEditText>(R.id.tiBar).text.toString(),
                 this
             )
+            true
         }
     }
 
