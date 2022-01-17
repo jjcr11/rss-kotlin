@@ -6,7 +6,10 @@ import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
 import java.io.InputStream
 import java.lang.IllegalStateException
+import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.*
+import java.util.logging.SimpleFormatter
 
 class XmlParser {
 
@@ -186,9 +189,10 @@ class XmlParser {
     private fun readDate(parser: XmlPullParser): Date {
         parser.require(XmlPullParser.START_TAG, ns, "pubDate")
         val title = readText(parser)
-        val date = Date(title)
+        val formatterParser = SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z")
+        val date = formatterParser.parse(title)
         parser.require(XmlPullParser.END_TAG, ns, "pubDate")
-        return date
+        return date!!
     }
 
     @Throws(XmlPullParserException::class, IOException::class)

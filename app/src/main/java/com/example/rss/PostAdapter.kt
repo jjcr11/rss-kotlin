@@ -38,9 +38,9 @@ class PostAdapter(
         with(holder) {
             val body = Jsoup.parse("<h1>${post.title}</h1>")
             if(post.author == null) {
-                body.append("<div>${post.source} / Unknown</div>")
+                body.append("<div class=\"source\">${post.source} / Unknown</div>")
             } else {
-                body.append("<div>${post.source} / ${post.author}</div>")
+                body.append("<div class=\"source\">${post.source} / ${post.author}</div>")
             }
             val post2 = post.content.replace(r, "")
             val post3 = post2.replace(r2, "")
@@ -53,6 +53,9 @@ class PostAdapter(
                         text-align: justify;
                         line-height: 24px;
                         font-size: ${size - 8};
+                    }
+                    .source {
+                        font-style: italic;
                     }
                     h1 {
                         font-size: ${size}px;

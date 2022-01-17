@@ -33,7 +33,8 @@
             app:layout_constraintStart_toEndOf="@+id/imgRss"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="@id/imgRss"
-            tools:text="Forbes Mexico"/>
+            tools:text="Forbes Mexico"
+            android:maxLength="40"/>
 
         <TextView
             android:id="@+id/tvUrl"
