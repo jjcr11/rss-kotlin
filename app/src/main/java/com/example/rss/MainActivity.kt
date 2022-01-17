@@ -38,9 +38,15 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
+        if(sharedPreference.getBoolean("theme", false)) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
 
         binding.cpi.visibility = View.GONE
 
@@ -65,7 +71,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         //Hide the action bar by default
         supportActionBar?.hide()
 
-        val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
+        //val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
         sharedPreference.getInt("cornerRadius", 0)
         feedAdapter = FeedAdapter(mutableListOf(), sharedPreference.getInt("cornerRadius", 0), this)
 

@@ -18,10 +18,27 @@ class SettingsActivity : AppCompatActivity() {
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        supportActionBar?.hide()
+
         val sharedPreference = getSharedPreferences("settings",Context.MODE_PRIVATE)
         binding.sSize.value = sharedPreference.getInt("size", 24).toFloat()
         binding.sCornerRadius.value = sharedPreference.getInt("cornerRadius", 0).toFloat()
         binding.cv.radius = binding.sCornerRadius.value
+        //sharedPreference.getBoolean("theme", false)
+
+        if(sharedPreference.getBoolean("theme", false)) {
+            binding.rgTheme.check(R.id.rbDark)
+        } else {
+            binding.rgTheme.check(R.id.rbLight)
+        }
+
+        binding.rgTheme.setOnCheckedChangeListener { group, checkedId ->
+            if(checkedId == R.id.rbLight) {
+                sharedPreference.edit().putBoolean("theme", false).commit()
+            } else {
+                sharedPreference.edit().putBoolean("theme", true).commit()
+            }
+        }
 
         val body = Jsoup.parse("<h1>Title</h1>")
         body.append("<div>Forbes mexico / Sasha grey</div>")
@@ -74,9 +91,6 @@ class SettingsActivity : AppCompatActivity() {
             binding.wvLorem.loadData(body.html(), "text/html", null)
             val sharedPreference = getSharedPreferences("settings",Context.MODE_PRIVATE)
             sharedPreference.edit().putInt("size", value.toInt()).commit()
-            //Log.d("SHREEEEE", sharedPreference.getInt("size", 24).toString())
-
-            //sharedPreference.edit().putInt("size", value.toInt()).commit()
         }
 
         binding.sCornerRadius.addOnChangeListener { slider, value, fromUser ->

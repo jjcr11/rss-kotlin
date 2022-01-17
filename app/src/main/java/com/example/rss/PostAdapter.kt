@@ -14,7 +14,8 @@ import org.jsoup.Jsoup
 class PostAdapter(
     private var posts: MutableList<FullFeedEntity>,
     private val metrics: Map<String, Int>,
-    private var size: Int
+    private var size: Int,
+    private var theme: Boolean = false
 ): RecyclerView.Adapter<PostAdapter.ViewHolder>() {
 
     private lateinit var context: Context
@@ -35,6 +36,18 @@ class PostAdapter(
         val post = posts[position]
         val r = Regex("style *= *\".*\"")
         val r2 = Regex("#")
+        var blue = ""
+        var background = ""
+        var text = ""
+        if(theme) {
+            blue = "rgb(12, 75, 87)"
+            background = "rgb(0, 0, 0)"
+            text = "rgb(255, 255, 255)"
+        } else {
+            blue = "rgb(119, 216, 236)"
+            background = "rgb(255, 255, 255)"
+            text = "rgb(0, 0, 0)"
+        }
         with(holder) {
             val body = Jsoup.parse("<h1>${post.title}</h1>")
             if(post.author == null) {
@@ -53,6 +66,8 @@ class PostAdapter(
                         text-align: justify;
                         line-height: 24px;
                         font-size: ${size - 8};
+                        background-color: ${background};
+                        color: ${text};
                     }
                     .source {
                         font-style: italic;
@@ -61,7 +76,7 @@ class PostAdapter(
                         font-size: ${size}px;
                     }
                     a:link {
-                        color: rgb(119, 216, 236);
+                        color: ${blue};
                     }
                     img {
                         width: 100%;

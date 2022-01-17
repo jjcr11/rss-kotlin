@@ -45,7 +45,7 @@ class PostActivity : AppCompatActivity() {
         val position: Int = intent.getIntExtra("position", 0)
 
         val sharedPreference = getSharedPreferences("settings",Context.MODE_PRIVATE)
-        postAdapter = PostAdapter(list, metrics, sharedPreference.getInt("size", 24))
+        postAdapter = PostAdapter(list, metrics, sharedPreference.getInt("size", 24), sharedPreference.getBoolean("theme", false))
 
         binding.vp.apply {
             adapter = postAdapter

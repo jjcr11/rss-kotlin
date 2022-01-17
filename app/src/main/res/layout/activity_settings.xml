@@ -4,56 +4,34 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".SettingsActivity"
-    android:layout_margin="@dimen/common_min">
+    android:layout_height="wrap_content"
+    tools:context=".SettingsActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/common_min">
 
         <TextView
-            android:id="@+id/tvTypography"
+            android:id="@+id/tvSettings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Typography"
+            android:text="Settings"
             android:textColor="@color/black"
-            android:textSize="@dimen/common_default"
+            android:textSize="@dimen/common_max"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
-
-        <RadioGroup
-            android:id="@+id/rgTypography"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:checkedButton="@id/rbRoboto"
-            app:layout_constraintStart_toStartOf="@id/tvTypography"
-            app:layout_constraintTop_toBottomOf="@id/tvTypography">
-
-            <RadioButton
-                android:id="@+id/rbRoboto"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="Roboto (default)"/>
-            <RadioButton
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="2"/>
-            <RadioButton
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="3"/>
-        </RadioGroup>
 
         <TextView
             android:id="@+id/tvSize"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Size"
+            android:text="Text size"
             android:textColor="@color/black"
             android:textSize="@dimen/common_default"
-            app:layout_constraintStart_toStartOf="@id/rgTypography"
-            app:layout_constraintTop_toBottomOf="@id/rgTypography"/>
+            android:layout_marginTop="@dimen/common_default"
+            app:layout_constraintStart_toStartOf="@id/tvSettings"
+            app:layout_constraintTop_toBottomOf="@id/tvSettings"/>
 
         <com.google.android.material.slider.Slider
             android:id="@+id/sSize"
@@ -73,12 +51,23 @@
             app:layout_constraintStart_toStartOf="@id/sSize"
             app:layout_constraintTop_toBottomOf="@id/sSize"/>
 
+        <TextView
+            android:id="@+id/tvRadius"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Corner radius"
+            android:textColor="@color/black"
+            android:textSize="@dimen/common_default"
+            android:layout_marginTop="@dimen/common_default"
+            app:layout_constraintStart_toStartOf="@id/wvLorem"
+            app:layout_constraintTop_toBottomOf="@id/wvLorem"/>
+
         <com.google.android.material.slider.Slider
             android:id="@+id/sCornerRadius"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="@id/wvLorem"
-            app:layout_constraintTop_toBottomOf="@id/wvLorem"
+            app:layout_constraintStart_toStartOf="@id/tvRadius"
+            app:layout_constraintTop_toBottomOf="@id/tvRadius"
             android:valueFrom="0.0"
             android:valueTo="100.0"
             android:stepSize="1"
@@ -141,13 +130,25 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <TextView
+            android:id="@+id/tvTheme"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Theme"
+            android:textColor="@color/black"
+            android:textSize="@dimen/common_default"
+            android:layout_marginTop="@dimen/common_default"
+            app:layout_constraintStart_toStartOf="@id/cv"
+            app:layout_constraintTop_toBottomOf="@id/cv"/>
+
         <RadioGroup
             android:id="@+id/rgTheme"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checkedButton="@id/rbLight"
-            app:layout_constraintStart_toStartOf="@id/cv"
-            app:layout_constraintTop_toBottomOf="@id/cv">
+            android:layout_marginBottom="@dimen/common_min"
+            app:layout_constraintStart_toStartOf="@id/tvTheme"
+            app:layout_constraintTop_toBottomOf="@id/tvTheme">
 
             <RadioButton
                 android:id="@+id/rbLight"
@@ -155,13 +156,10 @@
                 android:layout_height="match_parent"
                 android:text="Light theme"/>
             <RadioButton
+                android:id="@+id/rbDark"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="Dark theme"/>
-            <RadioButton
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="System"/>
         </RadioGroup>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
