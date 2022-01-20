@@ -1,8 +1,6 @@
 package com.example.rss
 
 import android.content.Context
-import android.provider.ContactsContract
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.rss.databinding.SourcesItemBinding
 
 //Adapter to be used by the cards from sources_item.xml
-class SourceAdapter(private var sources: MutableList<SourceEntity>): RecyclerView.Adapter<SourceAdapter.ViewHolder>() {
+class SourceAdapter(
+    private var sources: MutableList<SourceEntity>
+    ): RecyclerView.Adapter<SourceAdapter.ViewHolder>() {
 
     private lateinit var context: Context
 
@@ -34,13 +34,17 @@ class SourceAdapter(private var sources: MutableList<SourceEntity>): RecyclerVie
                 val t = Thread {
                     val f = DatabaseApplication.database.dao().getAllFeedsById(source.id)
                     DatabaseApplication.database.dao().deleteFeeds(f)
-                    DatabaseApplication.database.dao().deleteSourceById(source.id)
+                    DatabaseApplication.database.dao().deleteSource(source.id)
                 }
                 t.start()
                 t.join()
                 sources.remove(source)
                 notifyDataSetChanged()
-                Toast.makeText(context, "You can see the feeds from ${source.name} until close the app", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    "You can see the feeds from ${source.name} until close the app",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }

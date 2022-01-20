@@ -47,7 +47,7 @@
                 android:id="@+id/tvSlash"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=" | "
+                android:text="@string/line"
                 android:textColor="@color/gray"
                 app:layout_constraintStart_toEndOf="@id/tvSource"
                 app:layout_constraintTop_toTopOf="@id/tvSource"

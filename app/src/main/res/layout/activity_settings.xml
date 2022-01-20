@@ -16,7 +16,7 @@
             android:id="@+id/tvSettings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Settings"
+            android:text="@string/settings"
             android:textColor="@color/black"
             android:textSize="@dimen/common_max"
             app:layout_constraintStart_toStartOf="parent"
@@ -26,7 +26,7 @@
             android:id="@+id/tvSize"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Text size"
+            android:text="@string/text_size"
             android:textColor="@color/black"
             android:textSize="@dimen/common_default"
             android:layout_marginTop="@dimen/common_default"
@@ -55,7 +55,7 @@
             android:id="@+id/tvRadius"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Corner radius"
+            android:text="@string/corner_radius"
             android:textColor="@color/black"
             android:textSize="@dimen/common_default"
             android:layout_marginTop="@dimen/common_default"
@@ -98,7 +98,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    android:text="Preocupa a porteños posible llegada de cientos de migrantes mmmmm mmmm mmmm Preocupa a porteños posible llegada de cientos de migrantes mmmmm mmmm mmmm"/>
+                    android:text="@string/card_view_content"/>
 
                 <TextView
                     android:id="@+id/tvSource"
@@ -107,13 +107,13 @@
                     android:textColor="@color/gray"
                     app:layout_constraintStart_toStartOf="@id/tvTitle"
                     app:layout_constraintTop_toBottomOf="@id/tvTitle"
-                    android:text="Forbes Mexico" />
+                    android:text="@string/card_view_title" />
 
                 <TextView
                     android:id="@+id/tvSlash"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=" / "
+                    android:text="@string/slash"
                     android:textColor="@color/gray"
                     app:layout_constraintStart_toEndOf="@id/tvSource"
                     app:layout_constraintTop_toTopOf="@id/tvSource"
@@ -134,7 +134,7 @@
             android:id="@+id/tvTheme"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Theme"
+            android:text="@string/theme"
             android:textColor="@color/black"
             android:textSize="@dimen/common_default"
             android:layout_marginTop="@dimen/common_default"
@@ -154,12 +154,12 @@
                 android:id="@+id/rbLight"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Light theme"/>
+                android:text="@string/light_theme"/>
             <RadioButton
                 android:id="@+id/rbDark"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Dark theme"/>
+                android:text="@string/dark_theme"/>
         </RadioGroup>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

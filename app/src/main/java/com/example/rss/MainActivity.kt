@@ -9,10 +9,7 @@ import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
-import android.view.Gravity
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
@@ -27,63 +24,42 @@ import java.io.InputStream
 import java.io.Serializable
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.*
-import kotlin.concurrent.schedule
 
 class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var feedAdapter: FeedAdapter
     private lateinit var linearLayoutManager: RecyclerView.LayoutManager
+    private val context = this
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        //Hide the action bar by default
+        supportActionBar?.hide()
+        binding.cpi.visibility = View.GONE
+
         val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
+        sharedPreference.getInt("cornerRadius", 0)
         if(sharedPreference.getBoolean("theme", false)) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         }
 
-        binding.cpi.visibility = View.GONE
-
-        Thread {
-            try {
-                var sources = DatabaseApplication.database.dao().getSources()
-                for(source in sources) {
-                    var feedsById = DatabaseApplication.database.dao().getFeedsById(source.id)
-                    var count = 0
-                    var size = feedsById.size
-                    while(size > 26) {
-                        DatabaseApplication.database.dao().deleteOldFeeds(feedsById[count])
-                        size -= 1
-                        count += 1
-                    }
-                }
-            } catch (e: SQLiteConstraintException) {
-                Log.d("EXCEPTION", e.toString())
-            }
-        }.start()
-
-        //Hide the action bar by default
-        supportActionBar?.hide()
-
-        //val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
-        sharedPreference.getInt("cornerRadius", 0)
         feedAdapter = FeedAdapter(mutableListOf(), sharedPreference.getInt("cornerRadius", 0), this)
 
         linearLayoutManager = LinearLayoutManager(this)
-
-        getData()
-        //getFeeds()
 
         binding.rv.apply {
             layoutManager = linearLayoutManager
             adapter = feedAdapter
         }
+
+        deleteData()
+        getData()
 
         //If the recycler view scrolls then floating action button extends or shrinks
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -100,39 +76,55 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         binding.mtb.menu.getItem(0).title = feedAdapter.itemCount.toString()
 
         binding.fabe.setOnClickListener {
-            val sourceActivity = Intent(this, SourceActivity::class.java)
-            startActivity(sourceActivity)
+            startActivity(Intent(this, SourceActivity::class.java))
         }
 
         binding.mtb.setNavigationOnClickListener {
             binding.dl.openDrawer(GravityCompat.START)
         }
 
-        binding.nv.menu.getItem(0).setOnMenuItemClickListener {
-            val settingsActivity = Intent(this, SettingsActivity::class.java)
-            startActivity(settingsActivity)
-            true
+        with(binding.nv.menu) {
+
+            getItem(0).setOnMenuItemClickListener {
+                startActivity(Intent(context, SettingsActivity::class.java))
+                true
+            }
+
+            getItem(1).setOnMenuItemClickListener {
+                startActivity(Intent(context, SavedActivity::class.java))
+                true
+            }
+
+            getItem(2).setOnMenuItemClickListener {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/jjcr11/")))
+                true
+            }
+
+            getItem(3).setOnMenuItemClickListener {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.paypal.me/jjcr11")))
+                true
+            }
         }
+    }
 
-        binding.nv.menu.getItem(1).setOnMenuItemClickListener {
-            val savedActivity = Intent(this, SavedActivity::class.java)
-            startActivity(savedActivity)
-            true
-        }
-
-        binding.nv.menu.getItem(2).setOnMenuItemClickListener {
-            val codeIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/jjcr11/"))
-            startActivity(codeIntent)
-            true
-        }
-
-        binding.nv.menu.getItem(3).setOnMenuItemClickListener {
-            val donateIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.paypal.me/jjcr11"))
-            startActivity(donateIntent)
-            true
-        }
-
-
+    private fun deleteData() {
+        Thread {
+            try {
+                val sources = DatabaseApplication.database.dao().getAllSources()
+                for(source in sources) {
+                    val feedsById = DatabaseApplication.database.dao().getFeedsId(source.id)
+                    var count = 0
+                    var size = feedsById.size
+                    while(size > 26) {
+                        DatabaseApplication.database.dao().deleteFeedById(feedsById[count])
+                        size -= 1
+                        count += 1
+                    }
+                }
+            } catch (e: SQLiteConstraintException) {
+                Log.d("DeleteData", e.toString())
+            }
+        }.start()
     }
 
     private fun getData() {
@@ -142,21 +134,17 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         val isConnected: Boolean = activeNetwork?.isConnectedOrConnecting == true
         if(isConnected) {
             runBlocking(Dispatchers.IO) {
-                sources = DatabaseApplication.database.dao().getSources()
+                sources = DatabaseApplication.database.dao().getAllSources()
             }
             if(sources.size > 0) {
                 binding.cpi.visibility = View.VISIBLE
                 for(source: SourceEntity in sources) {
-                    //Log.d("SOURCES", source.name!!)
                     downloadXmlTask(source.url, source.id)
                 }
             }
         } else {
             Toast.makeText(this, "No internet connection", Toast.LENGTH_SHORT).show()
         }
-        /*Handler(Looper.myLooper()!!).postDelayed({
-            getFeeds()
-        }, 2000)*/
     }
 
     private fun downloadXmlTask(url: String?, id: Int) {
@@ -168,7 +156,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
                     try {
                         DatabaseApplication.database.dao().addFeed(feed)
                     } catch (e: SQLiteConstraintException) {
-                        Log.d("TITLE: ", e.toString())
+                        Log.d("DownloadXmlTask", e.toString())
                     }
                 }
             }
@@ -211,7 +199,6 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
     }
 
     override fun onClick(feed: FullFeedEntity, position: Int) {
-        //Toast.makeText(this, position.toString(), Toast.LENGTH_SHORT).show()
         val postActivity = Intent(this, PostActivity::class.java)
         postActivity.putExtra("list", feedAdapter.getFeeds() as Serializable)
         postActivity.putExtra("position", position)

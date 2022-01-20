@@ -10,8 +10,6 @@ import android.transition.TransitionInflater
 import android.transition.TransitionManager
 import android.util.Log
 import android.view.View
-import android.widget.ImageButton
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -46,7 +44,7 @@ class SourceActivity : AppCompatActivity() {
 
         //First initialize sourceAdapter with a empty mutable list
         sourceAdapter = SourceAdapter(mutableListOf())
-        //After call getSources to get sources into the database
+        //After call getAllSources to get sources into the database
         getSources()
 
         binding.rv.apply {
@@ -54,11 +52,7 @@ class SourceActivity : AppCompatActivity() {
             adapter = sourceAdapter
         }
 
-        //View from other_source_bat.xml to do the transition
-        //val viewOtherSourceBar = layoutInflater.inflate(R.layout.other_source_bar, null)
         viewOtherSourceBar = layoutInflater.inflate(R.layout.other_source_bar, null)
-        //View from the material tool bar in activity_source.xml
-        val viewMaterialToolBar: View = binding.mtb
 
         //Object transition of slide type from source_bar_transition.xml
         val transition: Transition = TransitionInflater
@@ -67,8 +61,6 @@ class SourceActivity : AppCompatActivity() {
 
         //Scene to change the app bar layout in activity_source.xml to viewOtherSourceBar
         val fromAppBarLayoutToViewOtherSourceBar = Scene(binding.abl, viewOtherSourceBar)
-        //Scene to change the app bar layout in activity_source.xml to viewMaterialToolBar
-        val fromAppBarLayoutToViewMaterialToolBar = Scene(binding.abl, viewMaterialToolBar)
 
         binding.mtb.menu.getItem(0).setOnMenuItemClickListener {
             TransitionManager.go(fromAppBarLayoutToViewOtherSourceBar, transition)
@@ -87,7 +79,7 @@ class SourceActivity : AppCompatActivity() {
     //Function to get sources into the database
     private fun getSources() {
         runBlocking(Dispatchers.IO) {
-            val sources = DatabaseApplication.database.dao().getSources()
+            val sources = DatabaseApplication.database.dao().getAllSources()
             sourceAdapter.setSources(sources)
         }
     }
@@ -113,14 +105,16 @@ class SourceActivity : AppCompatActivity() {
                     Log.d("EXCEPTION", e.toString())
                     runBlocking(Dispatchers.Main) {
                         binding.cpi.visibility = View.GONE
-                        val builder = AlertDialog.Builder(context)
-                        builder.setMessage("Error with the link")
-                            .setPositiveButton("ACCEPT",
+                        AlertDialog.Builder(context)
+                            .setMessage("Error with the link")
+                            .setPositiveButton(
+                                "ACCEPT",
                                 DialogInterface.OnClickListener { dialog, id ->
                                     // FIRE ZE MISSILES!
-                                })
-                        builder.create()
-                        builder.show()
+                                }
+                            )
+                            .create()
+                            .show()
                     }
                 }
 

@@ -65,6 +65,5 @@
         app:menu="@menu/navigation_drawer"
         android:layout_gravity="start"/>
 
-
 </androidx.drawerlayout.widget.DrawerLayout>
 

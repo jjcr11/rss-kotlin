@@ -10,17 +10,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!--ImageButton
-            android:id="@+id/imgb"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_check_circle"
-            android:backgroundTint="@color/white"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/mtb"
-            app:layout_constraintBottom_toBottomOf="parent"/-->
-
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/mtb"
             android:layout_width="match_parent"

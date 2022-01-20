@@ -48,11 +48,6 @@ class FeedAdapter(
         return feeds.size
     }
 
-    fun add(feedEntity: FullFeedEntity) {
-        feeds.add(feedEntity)
-        notifyDataSetChanged()
-    }
-
     fun setFeeds(feeds: MutableList<FullFeedEntity>) {
         this.feeds = feeds
         notifyDataSetChanged()

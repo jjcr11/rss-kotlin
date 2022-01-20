@@ -7,9 +7,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.lang.IllegalStateException
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.util.*
-import java.util.logging.SimpleFormatter
 
 class XmlParser {
 
@@ -46,7 +44,6 @@ class XmlParser {
                 continue
             }
             if (parser.name == "channel") {
-
                 channel = readChannel(parser)
             } else {
                 skip(parser)

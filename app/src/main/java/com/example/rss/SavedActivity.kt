@@ -2,7 +2,6 @@ package com.example.rss
 
 import android.content.Context
 import android.content.Intent
-import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -33,18 +32,18 @@ class SavedActivity : AppCompatActivity(), FeedAdapterOnClickListener {
 
         linearLayoutManager = LinearLayoutManager(this)
 
-        getFeeds()
-
         binding.rv.apply {
             layoutManager = linearLayoutManager
             adapter = feedAdapter
         }
+
+        getFeeds()
     }
 
     private fun getFeeds() {
         var feeds: MutableList<FullFeedEntity> = mutableListOf()
         val t = Thread {
-            feeds = DatabaseApplication.database.dao().getSavedFeeds()
+            feeds = DatabaseApplication.database.dao().getAllFeedsSaved()
 
         }
         t.start()
