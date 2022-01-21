@@ -5,10 +5,12 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.example.rss.databinding.ActivityPostBinding
 import androidx.core.content.ContextCompat
+import com.google.android.material.button.MaterialButton
 
 
 class PostActivity : AppCompatActivity() {
@@ -28,7 +30,15 @@ class PostActivity : AppCompatActivity() {
         val position: Int = intent.getIntExtra("position", 0)
 
         val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
-        postAdapter = PostAdapter(list, sharedPreference.getInt("size", 24), sharedPreference.getBoolean("theme", false))
+        //val align = sharedPreference.getInt("align", R.id.mbtnLeft)
+        //Log.d("ALIGN", R.id.mbtnLeft.toString())
+        postAdapter = PostAdapter(
+            list,
+            sharedPreference.getInt("size", 24),
+            sharedPreference.getBoolean("theme", false),
+            sharedPreference.getInt("lineHeight", 24),
+            sharedPreference.getString("align", "Left")!!
+        )
 
         binding.vp.apply {
             adapter = postAdapter

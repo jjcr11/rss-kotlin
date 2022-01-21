@@ -31,7 +31,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                tools:text="Preocupa a porteños posible llegada de cientos de migrantes mmmmm mmmm mmmm Preocupa a porteños posible llegada de cientos de migrantes mmmmm mmmm mmmm"/>
+                tools:text="@string/card_view_content"/>
 
             <TextView
                 android:id="@+id/tvSource"
@@ -40,7 +40,7 @@
                 android:textColor="@color/gray"
                 app:layout_constraintStart_toStartOf="@id/tvTitle"
                 app:layout_constraintTop_toBottomOf="@id/tvTitle"
-                tools:text="Forbes Mexico"
+                tools:text="@string/card_view_title"
                 android:maxLength="30"/>
 
             <TextView
@@ -60,7 +60,7 @@
                 android:textColor="@color/gray"
                 app:layout_constraintStart_toEndOf="@id/tvSlash"
                 app:layout_constraintTop_toTopOf="@id/tvSlash"
-                tools:text="3h" />
+                tools:text="@string/card_date"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

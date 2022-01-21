@@ -6,15 +6,25 @@
     <string name="tiedt_osb_hint">Rss link</string>
     <string name="settings">Settings</string>
     <string name="text_size">Text size</string>
-    <string name="corner_radius">Corner radius</string>
-    <string name="card_view_content">Preocupa a porteños posible llegada de cientos de migrantes mmmmm mmmm mmmm Preocupa a porteños posible llegada de cientos de migrantes mmmmm mmmm mmmm</string>
-    <string name="card_view_title">Forbes Mexico</string>
-    <string name="slash">/</string>
+    <string name="card_view_content">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc laoreet orci
+            cursus pretium volutpat. Nulla sed ex vestibulum, vestibulum purus nec, efficitur enim.
+            Vestibulum eu magna tincidunt eros porttitor hendrerit. Aenean vitae fermentum justo. Ut
+            porta ligula at metus cursus, ut lacinia metus mollis. Ut sed turpis dapibus,
+            gravida eros vitae, euismod felis. Maecenas malesuada ipsum tortor, a imperdiet purus
+            malesuada et. Ut commodo risus id pellentesque convallis. Vestibulum scelerisque ex nec
+            lorem mattis, vitae ultrices mi porta. Vivamus id malesuada est, nec suscipit justo.
+            Vestibulum sapien nulla, pretium vel posuere eu, ultricies in massa.</string>
+    <string name="card_view_title">Source</string>
     <string name="theme">Theme</string>
     <string name="light_theme">Light theme</string>
-    <string name="dark_theme">Dark theme</string>
-    <string name="line">" | "</string>
+    <string name="line"> | </string>
     <string name="saved">Saved</string>
     <string name="source_code">Source code</string>
     <string name="donate">Donate</string>
+    <string name="line_height">Line height</string>
+    <string name="aling_text">Aling text</string>
+    <string name="card_date">10/01/2022 - 1:10 PM</string>
+    <string name="corner_radius">Corner radius</string>
+    <string name="dark_theme">Dark theme</string>
+    <string name="warning">*You must reboot the app to see some changes</string>
 </resources>

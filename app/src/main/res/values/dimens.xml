@@ -6,4 +6,5 @@
     <dimen name="card_height">100dp</dimen>
     <dimen name="card_elevation">2dp</dimen>
     <dimen name="corner_radius">5dp</dimen>
+    <dimen name="toggle_width">100dp</dimen>
 </resources>

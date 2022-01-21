@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.rss.databinding.ActivitySettingsBinding
+import com.google.android.material.button.MaterialButton
 import org.jsoup.Jsoup
 
 class SettingsActivity : AppCompatActivity() {
@@ -20,68 +21,79 @@ class SettingsActivity : AppCompatActivity() {
 
         val sharedPreference = getSharedPreferences("settings",Context.MODE_PRIVATE)
         binding.sSize.value = sharedPreference.getInt("size", 24).toFloat()
+        binding.sLineHeight.value = sharedPreference.getInt("lineHeight", 24).toFloat()
         binding.sCornerRadius.value = sharedPreference.getInt("cornerRadius", 0).toFloat()
+
+
+        binding.tvValueSize.text = binding.sSize.value.toInt().toString()
+        binding.tvValueLineHeight.text = binding.sLineHeight.value.toInt().toString()
+        binding.tvValueCornerRadius.text = binding.sCornerRadius.value.toInt().toString()
+
         binding.cv.radius = binding.sCornerRadius.value
 
-        if(sharedPreference.getBoolean("theme", false)) {
-            binding.rgTheme.check(R.id.rbDark)
-        } else {
-            binding.rgTheme.check(R.id.rbLight)
+        var align = sharedPreference.getString("align", "Left")
+        when (align) {
+            binding.mbtnLeft.text.toString() -> {
+                binding.mbtg.check(R.id.mbtnLeft)
+            }
+            binding.mbtnCenter.text.toString() -> {
+                binding.mbtg.check(R.id.mbtnCenter)
+            }
+            binding.mbtnRight.text.toString() -> {
+                binding.mbtg.check(R.id.mbtnRight)
+            }
+            else -> {
+                binding.mbtg.check(R.id.mbtnJustify)
+            }
         }
 
+        binding.sm.isChecked = sharedPreference.getBoolean("theme", false)
+        val background = if(binding.sm.isChecked) { "rgb(0, 0, 0)" } else { "rgb(255, 255, 255)" }
+        val text = if(binding.sm.isChecked) { "rgb(255, 255, 255)" } else { "rgb(0, 0, 0)" }
+
         val body = Jsoup.parse("<h1>Title</h1>")
-        body.append("<div>Kotaku / Unknown</div>")
-        body.append("""<![CDATA[ <img src="https://i.kinja-img.com/gawker-media/image/upload/s--P_Jb
-            |0RA6--/c_fit,fl_progressive,q_80,w_636/56b98a9c3c7361755ea04dfeacdbf18f.jpg" /><p>Sourc
-            |e of over 2.9 percent of human disappointment, Logan Paul, may have spent $3.5 million 
-            |on a pile of fake Pokémon cards. After suspicions were raised by <a href="https://www.p
-            |okebeach.com/2021/12/logan-pauls-3-5-million-base-set-case-may-be-fake-pokemon-communit
-            |y-uncovers-significant-evidence" target="_blank" rel="noopener noreferrer"><em>Pok</em>
-            |é<em>Beach</em></a>, the former YouTuber has <a href="https://twitter.com/LoganPaul/sta
-            |tus/1478568426553561088" target="_blank" rel="noopener noreferrer">announced</a> he’s o
-            |ff to Chicago to get the case of first edition base set boosters properly verified.<br>
-            |</p><p><a href="https://kotaku.com/logan-paul-spends-3-5-million-on-pokemon-cards-that-
-            |ar-1848307244">Read more...</a></p> ]]>""".trimMargin())
+        body.append("<div class=\"source\">Source / Unknown</div>")
+        body.append(getString(R.string.card_view_content))
         val head = body.head()
         head.append(
             """
                 <style>
                     * {
-                        text-align: justify;
-                        line-height : 24px;
+                        text-align: ${align};
+                        line-height : ${binding.sLineHeight.value}px;
                         font-size: ${binding.sSize.value - 8}px;
+                        background-color: ${background};
+                        color: ${text};
+                    }
+                    .source {
+                        font-style: italic;
                     }
                     h1 {
                         font-size: ${binding.sSize.value}px;
-                    }
-                    a:link {
-                        color: rgb(119, 216, 236);
-                    }
-                    img {
-                        zoom: 25%;
                     }
                 </style>
                 """.trimIndent()
         )
         binding.wvLorem.loadData(body.html(), "text/html", null)
-        binding.sSize.addOnChangeListener { _, value, _ ->
-            head.getElementsByTag("style").empty()
+
+        binding.sSize.addOnChangeListener { slider, value, fromUser ->
+            binding.tvValueSize.text = value.toInt().toString()
+            head.getElementsByTag("style").remove()
             head.append(
                 """
                 <style>
                     * {
-                        text-align: justify;
-                        line-height : 24px;
-                        font-size: ${value.toInt() - 8}px;
+                        text-align: ${align};
+                        line-height : ${binding.sLineHeight.value}px;
+                        font-size: ${value - 8}px;
+                        background-color: ${background};
+                        color: ${text};
+                    }
+                    .source {
+                        font-style: italic;
                     }
                     h1 {
-                        font-size: ${value.toInt()}px;
-                    }
-                    a:link {
-                        color: rgb(119, 216, 236);
-                    }
-                    img {
-                        zoom: 25%;
+                        font-size: ${value}px;
                     }
                 </style>
                 """.trimIndent()
@@ -90,17 +102,66 @@ class SettingsActivity : AppCompatActivity() {
             sharedPreference.edit().putInt("size", value.toInt()).apply()
         }
 
+        binding.sLineHeight.addOnChangeListener { slider, value, fromUser ->
+            binding.tvValueLineHeight.text = value.toInt().toString()
+            head.getElementsByTag("style").remove()
+            head.append(
+                """
+                <style>
+                    * {
+                        text-align: ${align};
+                        line-height : ${value}px;
+                        font-size: ${binding.sSize.value - 8}px;
+                        background-color: ${background};
+                        color: ${text};
+                    }
+                    .source {
+                        font-style: italic;
+                    }
+                    h1 {
+                        font-size: ${binding.sSize.value}px;
+                    }
+                </style>
+                """.trimIndent()
+            )
+            binding.wvLorem.loadData(body.html(), "text/html", null)
+            sharedPreference.edit().putInt("lineHeight", value.toInt()).apply()
+        }
+
+        binding.mbtg.addOnButtonCheckedListener { group, checkedId, isChecked ->
+            align = findViewById<MaterialButton>(checkedId).text.toString()
+            head.getElementsByTag("style").remove()
+            head.append(
+                """
+                <style>
+                    * {
+                        text-align: ${findViewById<MaterialButton>(checkedId).text};
+                        line-height : ${binding.sLineHeight.value}px;
+                        font-size: ${binding.sSize.value - 8}px;
+                        background-color: ${background};
+                        color: ${text};
+                    }
+                    .source {
+                        font-style: italic;
+                    }
+                    h1 {
+                        font-size: ${binding.sSize.value}px;
+                    }
+                </style>
+                """.trimIndent()
+            )
+            binding.wvLorem.loadData(body.html(), "text/html", null)
+            sharedPreference.edit().putString("align", findViewById<MaterialButton>(checkedId).text.toString()).apply()
+        }
+
         binding.sCornerRadius.addOnChangeListener { _, value, _ ->
+            binding.tvValueCornerRadius.text = value.toInt().toString()
             binding.cv.radius = value
             sharedPreference.edit().putInt("cornerRadius", value.toInt()).apply()
         }
 
-        binding.rgTheme.setOnCheckedChangeListener { group, checkedId ->
-            if(checkedId == R.id.rbLight) {
-                sharedPreference.edit().putBoolean("theme", false).apply()
-            } else {
-                sharedPreference.edit().putBoolean("theme", true).apply()
-            }
+        binding.sm.setOnCheckedChangeListener { buttonView, isChecked ->
+            sharedPreference.edit().putBoolean("theme", isChecked).apply()
         }
     }
 }

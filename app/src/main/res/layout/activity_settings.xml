@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -17,8 +17,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/settings"
-            android:textColor="@color/black"
+            android:textColor="@color/gray"
             android:textSize="@dimen/common_max"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
@@ -27,51 +28,182 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/text_size"
-            android:textColor="@color/black"
+            android:textColor="@color/gray_light"
             android:textSize="@dimen/common_default"
             android:layout_marginTop="@dimen/common_default"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@id/tvSettings"
             app:layout_constraintTop_toBottomOf="@id/tvSettings"/>
 
         <com.google.android.material.slider.Slider
             android:id="@+id/sSize"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:valueFrom="12.0"
+            android:valueTo="30.0"
+            android:stepSize="1"
             app:layout_constraintStart_toStartOf="@id/tvSize"
             app:layout_constraintTop_toBottomOf="@id/tvSize"
-            android:valueFrom="24.0"
-            android:valueTo="100.0"
+            app:layout_constraintEnd_toStartOf="@id/tvValueSize"
+            app:labelBehavior="gone"/>
+
+        <TextView
+            android:id="@+id/tvValueSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/blue"
+            android:textSize="@dimen/common_default"
+            android:layout_marginEnd="@dimen/common_default"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="@id/sSize"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/sSize"
+            tools:text="0"/>
+
+        <TextView
+            android:id="@+id/tvLineHeight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/line_height"
+            android:textColor="@color/gray_light"
+            android:textSize="@dimen/common_default"
+            android:layout_marginTop="@dimen/common_default"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@id/sSize"
+            app:layout_constraintTop_toBottomOf="@id/sSize"/>
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/sLineHeight"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:valueFrom="12.0"
+            android:valueTo="30.0"
             android:stepSize="1"
-            app:labelBehavior="withinBounds"/>
+            app:layout_constraintStart_toStartOf="@id/tvLineHeight"
+            app:layout_constraintTop_toBottomOf="@id/tvLineHeight"
+            app:layout_constraintEnd_toStartOf="@id/tvValueLineHeight"
+            app:labelBehavior="gone"/>
+
+        <TextView
+            android:id="@+id/tvValueLineHeight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/blue"
+            android:textSize="@dimen/common_default"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="@id/sLineHeight"
+            app:layout_constraintEnd_toEndOf="@id/tvValueSize"
+            app:layout_constraintBottom_toBottomOf="@id/sLineHeight"
+            tools:text="0"/>
+
+        <TextView
+            android:id="@+id/tvAlign"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/aling_text"
+            android:textColor="@color/gray_light"
+            android:textSize="@dimen/common_default"
+            android:layout_marginTop="@dimen/common_default"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@id/sLineHeight"
+            app:layout_constraintTop_toBottomOf="@id/sLineHeight"/>
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/mbtg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@id/tvAlign"
+            app:layout_constraintTop_toBottomOf="@id/tvAlign"
+            app:singleSelection="true"
+            app:selectionRequired="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/mbtnLeft"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Left"
+                android:insetRight="@dimen/common_default"
+                style="?attr/materialButtonOutlinedStyle"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/mbtnCenter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Center"
+                style="?attr/materialButtonOutlinedStyle"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/mbtnRight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Right"
+                android:insetLeft="@dimen/common_default"
+                style="?attr/materialButtonOutlinedStyle"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/mbtnJustify"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Justify"
+                android:insetLeft="@dimen/common_default"
+                style="?attr/materialButtonOutlinedStyle"/>
+
+        </com.google.android.material.button.MaterialButtonToggleGroup>
 
         <WebView
             android:id="@+id/wvLorem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="@id/sSize"
-            app:layout_constraintTop_toBottomOf="@id/sSize"/>
+            app:layout_constraintStart_toStartOf="@id/mbtg"
+            app:layout_constraintTop_toBottomOf="@id/mbtg"/>
 
-        <TextView
-            android:id="@+id/tvRadius"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/corner_radius"
-            android:textColor="@color/black"
-            android:textSize="@dimen/common_default"
-            android:layout_marginTop="@dimen/common_default"
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="bottom"
+            android:background="@color/gray"
+            android:layout_marginVertical="@dimen/common_min"
             app:layout_constraintStart_toStartOf="@id/wvLorem"
             app:layout_constraintTop_toBottomOf="@id/wvLorem"/>
 
+        <TextView
+            android:id="@+id/tvCornerRadius"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/corner_radius"
+            android:textColor="@color/gray_light"
+            android:textSize="@dimen/common_default"
+            android:layout_marginTop="@dimen/common_default"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@id/divider"
+            app:layout_constraintTop_toBottomOf="@id/divider"/>
+
         <com.google.android.material.slider.Slider
             android:id="@+id/sCornerRadius"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="@id/tvRadius"
-            app:layout_constraintTop_toBottomOf="@id/tvRadius"
             android:valueFrom="0.0"
-            android:valueTo="100.0"
+            android:valueTo="50.0"
             android:stepSize="1"
-            app:labelBehavior="withinBounds"/>
+            app:layout_constraintStart_toStartOf="@id/tvCornerRadius"
+            app:layout_constraintTop_toBottomOf="@id/tvCornerRadius"
+            app:layout_constraintEnd_toStartOf="@id/tvValueCornerRadius"
+            app:labelBehavior="gone"/>
+
+        <TextView
+            android:id="@+id/tvValueCornerRadius"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/blue"
+            android:textSize="@dimen/common_default"
+            android:layout_marginEnd="@dimen/common_default"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="@id/sCornerRadius"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/sCornerRadius"
+            tools:text="0"/>
+
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cv"
@@ -113,7 +245,7 @@
                     android:id="@+id/tvSlash"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/slash"
+                    android:text="@string/line"
                     android:textColor="@color/gray"
                     app:layout_constraintStart_toEndOf="@id/tvSource"
                     app:layout_constraintTop_toTopOf="@id/tvSource"
@@ -124,9 +256,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/gray"
+                    android:text="@string/card_date"
                     app:layout_constraintStart_toEndOf="@id/tvSlash"
-                    app:layout_constraintTop_toTopOf="@id/tvSlash"
-                    tools:text="3h" />
+                    app:layout_constraintTop_toTopOf="@id/tvSlash" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -134,34 +266,31 @@
             android:id="@+id/tvTheme"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/theme"
-            android:textColor="@color/black"
+            android:text="@string/dark_theme"
+            android:textColor="@color/gray_light"
             android:textSize="@dimen/common_default"
             android:layout_marginTop="@dimen/common_default"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@id/cv"
             app:layout_constraintTop_toBottomOf="@id/cv"/>
 
-        <RadioGroup
-            android:id="@+id/rgTheme"
-            android:layout_width="match_parent"
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/sm"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checkedButton="@id/rbLight"
-            android:layout_marginBottom="@dimen/common_min"
-            app:layout_constraintStart_toStartOf="@id/tvTheme"
-            app:layout_constraintTop_toBottomOf="@id/tvTheme">
+            app:layout_constraintTop_toTopOf="@id/tvTheme"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/tvTheme"/>
 
-            <RadioButton
-                android:id="@+id/rbLight"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="@string/light_theme"/>
-            <RadioButton
-                android:id="@+id/rbDark"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="@string/dark_theme"/>
-        </RadioGroup>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/warning"
+            android:textColor="@color/red"
+            android:textSize="@dimen/common_min"
+            android:layout_marginVertical="@dimen/common_default"
+            app:layout_constraintStart_toStartOf="@id/tvTheme"
+            app:layout_constraintTop_toBottomOf="@id/tvTheme"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-</ScrollView>
+</androidx.core.widget.NestedScrollView>
