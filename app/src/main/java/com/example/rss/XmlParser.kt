@@ -186,7 +186,7 @@ class XmlParser {
     private fun readDate(parser: XmlPullParser): Date {
         parser.require(XmlPullParser.START_TAG, ns, "pubDate")
         val title = readText(parser)
-        val formatterParser = SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z")
+        val formatterParser = SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.US)
         val date = formatterParser.parse(title)
         parser.require(XmlPullParser.END_TAG, ns, "pubDate")
         return date!!

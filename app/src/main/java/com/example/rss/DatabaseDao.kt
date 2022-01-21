@@ -28,16 +28,16 @@ interface DatabaseDao {
     @Query("DELETE FROM FeedEntity WHERE id = :id")
     fun deleteFeedById(id: Int)
 
-    @Query("UPDATE FeedEntity set read = ${true} WHERE id = :id")
+    @Query("UPDATE FeedEntity set read = 1 WHERE id = :id")
     fun setFeedAsRead(id: Int)
 
     @Query("SELECT url FROM FeedEntity WHERE id = :id")
     fun getFeedUrl(id: Int): String
 
-    @Query("SELECT id FROM FeedEntity WHERE sourceId = :id and read = ${true} and saved = ${false} ORDER BY date")
+    @Query("SELECT id FROM FeedEntity WHERE sourceId = :id and read = 1 and saved = 0 ORDER BY date")
     fun getFeedsId(id: Int): MutableList<Int>
 
-    @Query("SELECT FeedEntity.id, title, name as source, date, author, content FROM FeedEntity INNER JOIN SourceEntity ON FeedEntity.sourceId = SourceEntity.id  WHERE FeedEntity.read = ${false} ORDER BY date LIMIT 50")
+    @Query("SELECT FeedEntity.id, title, name as source, date, author, content FROM FeedEntity INNER JOIN SourceEntity ON FeedEntity.sourceId = SourceEntity.id  WHERE FeedEntity.read = 0 ORDER BY date LIMIT 50")
     fun getUnreadFeeds(): MutableList<FullFeedEntity>
 
     @Query("UPDATE FeedEntity set saved = :saved where id = :id")
@@ -46,7 +46,7 @@ interface DatabaseDao {
     @Query("SELECT saved FROM FeedEntity where id = :id")
     fun getFeedSaved(id: Int): Boolean
 
-    @Query("SELECT FeedEntity.id, title, name as source, date, author, content FROM FeedEntity INNER JOIN SourceEntity ON FeedEntity.sourceId = SourceEntity.id  WHERE FeedEntity.saved = ${true} ORDER BY date LIMIT 50")
+    @Query("SELECT FeedEntity.id, title, name as source, date, author, content FROM FeedEntity INNER JOIN SourceEntity ON FeedEntity.sourceId = SourceEntity.id  WHERE FeedEntity.saved = 1 ORDER BY date LIMIT 50")
     fun getAllFeedsSaved(): MutableList<FullFeedEntity>
 
     @Query("SELECT * FROM FeedEntity WHERE sourceId = :id")

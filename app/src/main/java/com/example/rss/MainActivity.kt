@@ -24,6 +24,7 @@ import java.io.InputStream
 import java.io.Serializable
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.*
 
 class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
 
@@ -40,6 +41,11 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         //Hide the action bar by default
         supportActionBar?.hide()
         binding.cpi.visibility = View.GONE
+
+        val a = TimeZone.getDefault()
+
+        Log.d("ZONEEEEE", Locale.getDefault().toString())
+        Log.d("ZONEEEEE", android.text.format.DateFormat.getDateFormat(this).toString())
 
         val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
         sharedPreference.getInt("cornerRadius", 0)
@@ -121,7 +127,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
                         count += 1
                     }
                 }
-            } catch (e: SQLiteConstraintException) {
+            } catch (e: Exception) {
                 Log.d("DeleteData", e.toString())
             }
         }.start()
@@ -161,7 +167,11 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
                 }
             }
             runBlocking(Dispatchers.Main) {
-                getFeeds()
+                try {
+                    getFeeds()
+                } catch (e: Exception) {
+                    Log.d("DownloadGetFeeds", e.toString())
+                }
             }
         }
     }
