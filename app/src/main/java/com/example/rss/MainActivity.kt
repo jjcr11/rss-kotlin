@@ -42,11 +42,6 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         supportActionBar?.hide()
         binding.cpi.visibility = View.GONE
 
-        val a = TimeZone.getDefault()
-
-        Log.d("ZONEEEEE", Locale.getDefault().toString())
-        Log.d("ZONEEEEE", android.text.format.DateFormat.getDateFormat(this).toString())
-
         val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
         sharedPreference.getInt("cornerRadius", 0)
         if(sharedPreference.getBoolean("theme", false)) {
@@ -77,9 +72,6 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
                 }
             }
         }
-
-        //Get first item of top_app_bar.xml
-        binding.mtb.menu.getItem(0).title = feedAdapter.itemCount.toString()
 
         binding.fabe.setOnClickListener {
             startActivity(Intent(this, SourceActivity::class.java))
@@ -169,6 +161,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
             runBlocking(Dispatchers.Main) {
                 try {
                     getFeeds()
+                    binding.mtb.menu.getItem(0).title = feedAdapter.itemCount.toString()
                 } catch (e: Exception) {
                     Log.d("DownloadGetFeeds", e.toString())
                 }

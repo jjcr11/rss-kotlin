@@ -23,8 +23,8 @@ class PostAdapter(
     private val r = Regex("""style *= *".*"""")
     private val r2 = Regex("#")
     private val blue = if(theme) { "rgb(12, 75, 87)" } else { "rgb(119, 216, 236)" }
-    private val background = if(theme) { "rgb(0, 0, 0)" } else { "rgb(255, 255, 255)" }
-    private val text = if(theme) { "rgb(255, 255, 255)" } else { "rgb(0, 0, 0)" }
+    private val background = if(theme) { "rgb(36, 36, 36)" } else { "rgb(255, 255, 255)" }
+    private val text = if(theme) { "rgb(255, 255, 255)" } else { "rgb(36, 36, 36)" }
 
     inner class ViewHolder(view: View):RecyclerView.ViewHolder(view) {
         val binding = PostItemBinding.bind(view)

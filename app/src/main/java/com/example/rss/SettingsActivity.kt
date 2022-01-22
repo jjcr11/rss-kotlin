@@ -48,8 +48,8 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.sm.isChecked = sharedPreference.getBoolean("theme", false)
-        val background = if(binding.sm.isChecked) { "rgb(0, 0, 0)" } else { "rgb(255, 255, 255)" }
-        val text = if(binding.sm.isChecked) { "rgb(255, 255, 255)" } else { "rgb(0, 0, 0)" }
+        val background = if(binding.sm.isChecked) { "rgb(36, 36, 36)" } else { "rgb(255, 255, 255)" }
+        val text = if(binding.sm.isChecked) { "rgb(255, 255, 255)" } else { "rgb(36, 36, 36)" }
 
         val body = Jsoup.parse("<h1>Title</h1>")
         body.append("<div class=\"source\">Source / Unknown</div>")
