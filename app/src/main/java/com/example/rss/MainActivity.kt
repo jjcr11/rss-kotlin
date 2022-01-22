@@ -103,6 +103,10 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
                 true
             }
         }
+
+        binding.srl.setOnRefreshListener {
+            getData()
+        }
     }
 
     private fun deleteData() {
@@ -136,6 +140,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
             }
             if(sources.size > 0) {
                 binding.cpi.visibility = View.VISIBLE
+                binding.srl.isRefreshing = false
                 for(source: SourceEntity in sources) {
                     downloadXmlTask(source.url, source.id)
                 }

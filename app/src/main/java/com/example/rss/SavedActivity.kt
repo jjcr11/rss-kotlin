@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rss.databinding.ActivityMainBinding
@@ -25,6 +26,7 @@ class SavedActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         binding.fabe.hide()
         binding.mtb.visibility = View.GONE
         binding.cpi.visibility = View.GONE
+        binding.root.removeView(binding.nv)
 
         val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
         sharedPreference.getInt("cornerRadius", 0)
