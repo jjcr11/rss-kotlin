@@ -24,7 +24,6 @@ import java.io.InputStream
 import java.io.Serializable
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.*
 
 class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
 
@@ -32,6 +31,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
     private lateinit var feedAdapter: FeedAdapter
     private lateinit var linearLayoutManager: RecyclerView.LayoutManager
     private val context = this
+    private var flag: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,6 +105,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         }
 
         binding.srl.setOnRefreshListener {
+            flag = false
             getData()
         }
     }
@@ -139,8 +140,9 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
                 sources = DatabaseApplication.database.dao().getAllSources()
             }
             if(sources.size > 0) {
-                binding.cpi.visibility = View.VISIBLE
-                binding.srl.isRefreshing = false
+                if(flag) {
+                    binding.cpi.visibility = View.VISIBLE
+                }
                 for(source: SourceEntity in sources) {
                     downloadXmlTask(source.url, source.id)
                 }
@@ -202,7 +204,10 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         runBlocking(Dispatchers.IO) {
             feeds = DatabaseApplication.database.dao().getUnreadFeeds()
         }
-        binding.cpi.visibility = View.GONE
+        if(flag) {
+            binding.cpi.visibility = View.GONE
+        }
+        binding.srl.isRefreshing = false
         feedAdapter.setFeeds(feeds)
     }
 

@@ -5,7 +5,6 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rss.databinding.ActivityMainBinding
@@ -13,9 +12,9 @@ import java.io.Serializable
 
 class SavedActivity : AppCompatActivity(), FeedAdapterOnClickListener {
 
-    lateinit var binding: ActivityMainBinding
-    lateinit var feedAdapter: FeedAdapter
-    lateinit var linearLayoutManager: RecyclerView.LayoutManager
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var feedAdapter: FeedAdapter
+    private lateinit var linearLayoutManager: RecyclerView.LayoutManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +26,7 @@ class SavedActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         binding.mtb.visibility = View.GONE
         binding.cpi.visibility = View.GONE
         binding.root.removeView(binding.nv)
+        binding.srl.isEnabled = false
 
         val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
         sharedPreference.getInt("cornerRadius", 0)
