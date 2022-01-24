@@ -163,5 +163,12 @@ class SettingsActivity : AppCompatActivity() {
         binding.sm.setOnCheckedChangeListener { buttonView, isChecked ->
             sharedPreference.edit().putBoolean("theme", isChecked).apply()
         }
+
+        binding.mbtnReset.setOnClickListener {
+            binding.sSize.value = 24f
+            binding.sLineHeight.value = 24f
+            binding.sCornerRadius.value = 0f
+            binding.sm.isChecked = false
+        }
     }
 }

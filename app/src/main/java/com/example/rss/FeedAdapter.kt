@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rss.databinding.FeedItemBinding
 import java.text.SimpleDateFormat
+import java.util.*
 
 //Adapter to be used by the cards from headline_item.xml
 class FeedAdapter(
@@ -34,7 +35,7 @@ class FeedAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val feed = feeds[position]
-        val formatter = SimpleDateFormat("dd/MM/yyyy - h:mm a")
+        val formatter = SimpleDateFormat("dd/MM/yyyy - h:mm a", Locale.getDefault())
         with(holder) {
             setListener(feed, position)
             binding.tvTitle.text = feed.title

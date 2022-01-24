@@ -162,7 +162,6 @@
             android:id="@+id/divider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_gravity="bottom"
             android:background="@color/gray"
             android:layout_marginVertical="@dimen/common_min"
             app:layout_constraintStart_toStartOf="@id/wvLorem"
@@ -284,6 +283,7 @@
             app:layout_constraintBottom_toBottomOf="@id/tvTheme"/>
 
         <TextView
+            android:id="@+id/tvWarning"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/warning"
@@ -292,6 +292,24 @@
             android:layout_marginVertical="@dimen/common_default"
             app:layout_constraintStart_toStartOf="@id/tvTheme"
             app:layout_constraintTop_toBottomOf="@id/tvTheme"/>
+
+        <View
+            android:id="@+id/divider2"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray"
+            android:layout_marginVertical="@dimen/common_min"
+            app:layout_constraintStart_toStartOf="@id/tvWarning"
+            app:layout_constraintTop_toBottomOf="@id/tvWarning"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/mbtnReset"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Reset settings"
+            app:layout_constraintStart_toStartOf="@id/divider2"
+            app:layout_constraintTop_toBottomOf="@id/divider2"
+            style="?attr/materialButtonOutlinedStyle"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>
