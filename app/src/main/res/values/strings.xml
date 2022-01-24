@@ -17,7 +17,6 @@
     <string name="card_view_title">Source</string>
     <string name="theme">Theme</string>
     <string name="light_theme">Light theme</string>
-    <string name="line"> | </string>
     <string name="saved">Saved</string>
     <string name="source_code">Source code</string>
     <string name="donate">Donate</string>

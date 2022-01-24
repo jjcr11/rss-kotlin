@@ -13,6 +13,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -43,11 +44,16 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         binding.cpi.visibility = View.GONE
 
         val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
-        sharedPreference.getInt("cornerRadius", 0)
         if(sharedPreference.getBoolean("theme", false)) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
+
+        binding.mtb.menu.getItem(1).icon = if(sharedPreference.getBoolean("sort", true)) {
+            ContextCompat.getDrawable(this, R.drawable.ic_sort)
+        } else {
+            ContextCompat.getDrawable(this, R.drawable.ic_sort_2)
         }
 
         feedAdapter = FeedAdapter(mutableListOf(), sharedPreference.getInt("cornerRadius", 0), this)
@@ -60,7 +66,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         }
 
         deleteData()
-        getData()
+        getData(sharedPreference.getBoolean("sort", true))
 
         //If the recycler view scrolls then floating action button extends or shrinks
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -104,9 +110,24 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
             }
         }
 
+        binding.mtb.menu.getItem(1).setOnMenuItemClickListener {
+            sharedPreference.edit().putBoolean(
+                "sort",
+                !sharedPreference.getBoolean("sort", true)
+            ).apply()
+            binding.mtb.menu.getItem(1).icon = if(sharedPreference.getBoolean("sort", true)) {
+                ContextCompat.getDrawable(this, R.drawable.ic_sort)
+            } else {
+                ContextCompat.getDrawable(this, R.drawable.ic_sort_2)
+            }
+            getFeeds(sharedPreference.getBoolean("sort", true))
+
+            true
+        }
+
         binding.srl.setOnRefreshListener {
             flag = false
-            getData()
+            getData(sharedPreference.getBoolean("sort", true))
         }
     }
 
@@ -130,7 +151,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         }.start()
     }
 
-    private fun getData() {
+    private fun getData(sort: Boolean) {
         val sources: MutableList<SourceEntity>
         val cm = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
@@ -144,7 +165,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
                     binding.cpi.visibility = View.VISIBLE
                 }
                 for(source: SourceEntity in sources) {
-                    downloadXmlTask(source.url, source.id)
+                    downloadXmlTask(source.url, source.id, sort)
                 }
             }
         } else {
@@ -152,7 +173,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         }
     }
 
-    private fun downloadXmlTask(url: String?, id: Int) {
+    private fun downloadXmlTask(url: String?, id: Int, sort: Boolean) {
         var feeds: List<FeedEntity> = mutableListOf()
         GlobalScope.launch {
             feeds = loadXmlFromNetwork(url, id)
@@ -167,7 +188,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
             }
             runBlocking(Dispatchers.Main) {
                 try {
-                    getFeeds()
+                    getFeeds(sort)
                     binding.mtb.menu.getItem(0).title = feedAdapter.itemCount.toString()
                 } catch (e: Exception) {
                     Log.d("DownloadGetFeeds", e.toString())
@@ -199,10 +220,14 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         }
     }
 
-    private fun getFeeds() {
+    private fun getFeeds(sort: Boolean) {
         var feeds: MutableList<FullFeedEntity>
         runBlocking(Dispatchers.IO) {
-            feeds = DatabaseApplication.database.dao().getUnreadFeeds()
+            feeds = if(sort) {
+                DatabaseApplication.database.dao().getUnreadFeeds()
+            } else {
+                DatabaseApplication.database.dao().getUnreadFeedsDesc()
+            }
         }
         if(flag) {
             binding.cpi.visibility = View.GONE
