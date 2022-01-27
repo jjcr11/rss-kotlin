@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
             }
 
             getItem(2).setOnMenuItemClickListener {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/jjcr11/")))
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/jjcr11/rss-kotlin")))
                 true
             }
 
