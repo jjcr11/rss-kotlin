@@ -101,7 +101,7 @@
             android:id="@+id/tvAlign"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/aling_text"
+            android:text="@string/align_text"
             android:textColor="@color/black"
             android:textSize="@dimen/common_default"
             android:layout_marginTop="@dimen/common_default"
