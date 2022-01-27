@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/gradiant">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/mtbl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/common_default"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:focusable="false">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/mtb"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/white"
+            app:title="Feed"
+            app:titleTextColor="@color/gray_transparent"
+            app:menu="@menu/top_app_bar_post"
+            android:focusable="true"/>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/common_default"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/mtbl"
+        app:layout_constraintTop_toBottomOf="@+id/mtbl"
+        app:layout_constraintEnd_toEndOf="@+id/mtbl"
+        android:textSize="@dimen/common_default"
+        android:text="@string/empty_saved"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

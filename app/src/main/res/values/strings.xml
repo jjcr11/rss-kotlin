@@ -21,9 +21,10 @@
     <string name="source_code">Source code</string>
     <string name="donate">Donate</string>
     <string name="line_height">Line height</string>
-    <string name="aling_text">Aling text</string>
-    <string name="card_date">10/01/2022 - 1:10 PM</string>
+    <string name="align_text">Align text</string>
+    <string name="card_date">10/01/2022 – 1:10 PM</string>
     <string name="corner_radius">Corner radius</string>
     <string name="dark_theme">Dark theme</string>
     <string name="warning">*You must reboot the app to see some changes</string>
+    <string name="empty_saved">You can save post here to read later by clicking the bookmark icon in each post</string>
 </resources>

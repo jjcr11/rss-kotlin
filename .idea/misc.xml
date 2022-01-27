@@ -5,15 +5,20 @@
       <map>
         <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/drawable/gradiant.xml" value="0.3880208333333333" />
         <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/drawable/ic_add.xml" value="0.3880208333333333" />
-        <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/drawable/ic_bookmark.xml" value="0.19895833333333332" />
+        <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/drawable/ic_bookmark.xml" value="0.16799999999999998" />
+        <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/drawable/ic_bookmark_2.xml" value="0.2755208333333333" />
         <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/drawable/ic_bookmark_border.xml" value="0.19895833333333332" />
         <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/drawable/ic_cancel.xml" value="0.3880208333333333" />
         <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/drawable/ic_check_circle.xml" value="0.3880208333333333" />
         <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/drawable/ic_delete_forever.xml" value="0.3880208333333333" />
-        <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/drawable/ic_open_in_new.xml" value="0.3880208333333333" />
+        <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/drawable/ic_open_in_new.xml" value="0.2" />
+        <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/drawable/ic_open_in_new_2.xml" value="0.2065" />
+        <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/drawable/ic_share.xml" value="0.2755208333333333" />
+        <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/drawable/ic_share_2.xml" value="0.2065" />
         <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/drawable/ic_sort.xml" value="0.382051282051282" />
         <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/drawable/ic_sort_2.xml" value="0.382051282051282" />
         <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/drawable/ic_web.xml" value="0.3880208333333333" />
+        <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/drawable/ripple_item.xml" value="0.2755208333333333" />
         <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/font/roboto.xml" value="0.40208333333333335" />
         <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/layout/activity_main.xml" value="0.371875" />
         <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/layout/activity_post.xml" value="0.371875" />
@@ -21,6 +26,7 @@
         <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/layout/activity_settings.xml" value="0.4" />
         <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/layout/activity_sources.xml" value="0.371875" />
         <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/layout/another_source_bar.xml" value="0.371875" />
+        <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/layout/empty_saved.xml" value="0.259375" />
         <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/layout/feed_item.xml" value="0.371875" />
         <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/layout/headline_item.xml" value="0.371875" />
         <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/layout/other_source_bar.xml" value="0.371875" />
