@@ -1,4 +1,4 @@
-package com.example.rss
+package com.reader.rss
 
 import android.content.Context
 import android.content.Intent
@@ -8,7 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
-import com.example.rss.databinding.ActivityPostBinding
+import com.reader.rss.databinding.ActivityPostBinding
 import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 
@@ -50,9 +50,9 @@ class PostActivity : AppCompatActivity() {
             var url = ""
             var saved = false
             val t1 = Thread {
-                DatabaseApplication.database.dao().setFeedAsRead(list[binding.vp.currentItem].id)
-                saved = DatabaseApplication.database.dao().getFeedSaved(list[binding.vp.currentItem].id)
-                url = DatabaseApplication.database.dao().getFeedUrl(list[binding.vp.currentItem].id)
+                com.reader.rss.DatabaseApplication.database.dao().setFeedAsRead(list[binding.vp.currentItem].id)
+                saved = com.reader.rss.DatabaseApplication.database.dao().getFeedSaved(list[binding.vp.currentItem].id)
+                url = com.reader.rss.DatabaseApplication.database.dao().getFeedUrl(list[binding.vp.currentItem].id)
             }
             t1.start()
             t1.join()
@@ -66,7 +66,7 @@ class PostActivity : AppCompatActivity() {
                 setOnMenuItemClickListener {
                     binding.mtb.menu.getItem(0).isChecked = !binding.mtb.menu.getItem(0).isChecked
                     val t2 = Thread {
-                        DatabaseApplication.database.dao().setFeedAsSavedOrUnsaved(list[binding.vp.currentItem].id, binding.mtb.menu.getItem(0).isChecked)
+                        com.reader.rss.DatabaseApplication.database.dao().setFeedAsSavedOrUnsaved(list[binding.vp.currentItem].id, binding.mtb.menu.getItem(0).isChecked)
                     }
                     t2.start()
                     t2.join()

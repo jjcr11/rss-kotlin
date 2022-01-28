@@ -1,4 +1,4 @@
-package com.example.rss
+package com.reader.rss
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.example.rss.databinding.SourcesItemBinding
+import com.reader.rss.databinding.SourcesItemBinding
 
 //Adapter to be used by the cards from sources_item.xml
 class SourceAdapter(
@@ -32,9 +32,9 @@ class SourceAdapter(
             binding.tvUrl.text = source.url
             binding.imgDelete.setOnClickListener {
                 val t = Thread {
-                    val f = DatabaseApplication.database.dao().getAllFeedsById(source.id)
-                    DatabaseApplication.database.dao().deleteFeeds(f)
-                    DatabaseApplication.database.dao().deleteSource(source.id)
+                    val f = com.reader.rss.DatabaseApplication.database.dao().getAllFeedsById(source.id)
+                    com.reader.rss.DatabaseApplication.database.dao().deleteFeeds(f)
+                    com.reader.rss.DatabaseApplication.database.dao().deleteSource(source.id)
                 }
                 t.start()
                 t.join()

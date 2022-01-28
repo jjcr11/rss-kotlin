@@ -1,4 +1,4 @@
-package com.example.rss
+package com.reader.rss
 
 import android.util.Xml
 import org.xmlpull.v1.XmlPullParser

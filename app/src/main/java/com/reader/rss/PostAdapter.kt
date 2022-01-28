@@ -1,4 +1,4 @@
-package com.example.rss
+package com.reader.rss
 
 import android.content.Context
 import android.util.Log
@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
-import com.example.rss.databinding.PostItemBinding
+import com.reader.rss.databinding.PostItemBinding
 import org.jsoup.Jsoup
 
 class PostAdapter(

@@ -1,9 +1,9 @@
-package com.example.rss
+package com.reader.rss
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.example.rss.databinding.ActivitySettingsBinding
+import com.reader.rss.databinding.ActivitySettingsBinding
 import com.google.android.material.button.MaterialButton
 import org.jsoup.Jsoup
 

@@ -1,4 +1,4 @@
-package com.example.rss
+package com.reader.rss
 
 import android.content.Context
 import android.content.DialogInterface
@@ -13,7 +13,7 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.rss.databinding.ActivitySourcesBinding
+import com.reader.rss.databinding.ActivitySourcesBinding
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.*
@@ -79,7 +79,7 @@ class SourceActivity : AppCompatActivity() {
     //Function to get sources into the database
     private fun getSources() {
         runBlocking(Dispatchers.IO) {
-            val sources = DatabaseApplication.database.dao().getAllSources()
+            val sources = com.reader.rss.DatabaseApplication.database.dao().getAllSources()
             sourceAdapter.setSources(sources)
         }
     }
@@ -95,7 +95,7 @@ class SourceActivity : AppCompatActivity() {
                         url = viewOtherSourceBar.findViewById<TextInputEditText>(R.id.tiBar).text.toString()
                     )
                     runBlocking(Dispatchers.IO) {
-                        DatabaseApplication.database.dao().addSource(new)
+                        com.reader.rss.DatabaseApplication.database.dao().addSource(new)
                     }
                     runBlocking(Dispatchers.Main) {
                         binding.cpi.visibility = View.GONE

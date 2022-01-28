@@ -1,4 +1,4 @@
-package com.example.rss
+package com.reader.rss
 
 import android.content.Context
 import android.content.Intent
@@ -12,7 +12,7 @@ import androidx.core.view.allViews
 import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.rss.databinding.ActivityMainBinding
+import com.reader.rss.databinding.ActivityMainBinding
 import com.google.android.material.appbar.MaterialToolbar
 import java.io.Serializable
 
@@ -51,7 +51,7 @@ class SavedActivity : AppCompatActivity(), FeedAdapterOnClickListener {
     private fun getFeeds() {
         var feeds: MutableList<FullFeedEntity> = mutableListOf()
         val t = Thread {
-            feeds = DatabaseApplication.database.dao().getAllFeedsSaved()
+            feeds = com.reader.rss.DatabaseApplication.database.dao().getAllFeedsSaved()
 
         }
         t.start()

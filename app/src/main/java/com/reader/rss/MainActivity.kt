@@ -1,4 +1,4 @@
-package com.example.rss
+package com.reader.rss
 
 import android.content.Context
 import android.content.Intent
@@ -17,7 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.rss.databinding.ActivityMainBinding
+import com.reader.rss.databinding.ActivityMainBinding
 import kotlinx.coroutines.*
 import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
@@ -134,13 +134,13 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
     private fun deleteData() {
         Thread {
             try {
-                val sources = DatabaseApplication.database.dao().getAllSources()
+                val sources = com.reader.rss.DatabaseApplication.database.dao().getAllSources()
                 for(source in sources) {
-                    val feedsById = DatabaseApplication.database.dao().getFeedsId(source.id)
+                    val feedsById = com.reader.rss.DatabaseApplication.database.dao().getFeedsId(source.id)
                     var count = 0
                     var size = feedsById.size
                     while(size > 26) {
-                        DatabaseApplication.database.dao().deleteFeedById(feedsById[count])
+                        com.reader.rss.DatabaseApplication.database.dao().deleteFeedById(feedsById[count])
                         size -= 1
                         count += 1
                     }
@@ -158,7 +158,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         val isConnected: Boolean = activeNetwork?.isConnectedOrConnecting == true
         if(isConnected) {
             runBlocking(Dispatchers.IO) {
-                sources = DatabaseApplication.database.dao().getAllSources()
+                sources = com.reader.rss.DatabaseApplication.database.dao().getAllSources()
             }
             if(sources.size > 0) {
                 if(flag) {
@@ -180,7 +180,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
             runBlocking(Dispatchers.IO) {
                 for(feed in feeds) {
                     try {
-                        DatabaseApplication.database.dao().addFeed(feed)
+                        com.reader.rss.DatabaseApplication.database.dao().addFeed(feed)
                     } catch (e: SQLiteConstraintException) {
                         Log.d("DownloadXmlTask", e.toString())
                     }
@@ -224,9 +224,9 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         var feeds: MutableList<FullFeedEntity>
         runBlocking(Dispatchers.IO) {
             feeds = if(sort) {
-                DatabaseApplication.database.dao().getUnreadFeeds()
+                com.reader.rss.DatabaseApplication.database.dao().getUnreadFeeds()
             } else {
-                DatabaseApplication.database.dao().getUnreadFeedsDesc()
+                com.reader.rss.DatabaseApplication.database.dao().getUnreadFeedsDesc()
             }
         }
         if(flag) {

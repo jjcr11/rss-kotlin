@@ -1,4 +1,4 @@
-package com.example.rss
+package com.reader.rss
 
 import org.junit.Test
 

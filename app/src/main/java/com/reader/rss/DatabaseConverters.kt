@@ -1,4 +1,4 @@
-package com.example.rss
+package com.reader.rss
 
 import androidx.room.TypeConverter
 import java.util.*
