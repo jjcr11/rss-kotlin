@@ -2,6 +2,7 @@ package com.reader.rss
 
 import android.content.Context
 import android.content.DialogInterface
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.transition.Scene
@@ -105,7 +106,7 @@ class SourceActivity : AppCompatActivity() {
                     Log.d("EXCEPTION", e.toString())
                     runBlocking(Dispatchers.Main) {
                         binding.cpi.visibility = View.GONE
-                        AlertDialog.Builder(context)
+                        val dialog = AlertDialog.Builder(context)
                             .setMessage("Error with the link")
                             .setPositiveButton(
                                 "ACCEPT",
@@ -114,7 +115,12 @@ class SourceActivity : AppCompatActivity() {
                                 }
                             )
                             .create()
-                            .show()
+                        dialog.setOnShowListener {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getColor(R.color.black))
+                            }
+                        }
+                        dialog.show()
                     }
                 }
 

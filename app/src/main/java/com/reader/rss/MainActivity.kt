@@ -170,6 +170,8 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
             }
         } else {
             Toast.makeText(this, "No internet connection", Toast.LENGTH_SHORT).show()
+            binding.srl.isEnabled = false
+            getFeeds(sort)
         }
     }
 
