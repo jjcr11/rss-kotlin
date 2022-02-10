@@ -17,6 +17,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
 import com.reader.rss.databinding.ActivityMainBinding
 import kotlinx.coroutines.*
 import org.xmlpull.v1.XmlPullParserException
@@ -25,6 +28,7 @@ import java.io.InputStream
 import java.io.Serializable
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
 
@@ -38,6 +42,14 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val uploadWorkRequest: WorkRequest =
+            PeriodicWorkRequestBuilder<UploadWorker>(6, TimeUnit.HOURS)
+                .build()
+
+        WorkManager
+            .getInstance(this)
+            .enqueue(uploadWorkRequest)
 
         //Hide the action bar by default
         supportActionBar?.hide()
