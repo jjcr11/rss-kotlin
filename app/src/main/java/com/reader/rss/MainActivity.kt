@@ -213,11 +213,16 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
 
     @Throws(XmlPullParserException::class, IOException::class)
     private suspend fun loadXmlFromNetwork(urlString: String?, sourceId: Int): List<FeedEntity> {
-        val feeds: List<FeedEntity> = withContext(Dispatchers.IO) {
-            downloadUrl(urlString)?.use { stream ->
-                XmlParser().parse(stream, sourceId)
-            }!!
-        }
+        var feeds = listOf<FeedEntity>()
+        try {
+            feeds = withContext(Dispatchers.IO) {
+                downloadUrl(urlString)?.use { stream ->
+                    XmlParser().parse(stream, sourceId)
+                }!!
+            }
+        } catch (e: Exception) {
+
+         }
         return feeds
     }
 
