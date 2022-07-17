@@ -40,6 +40,11 @@
         <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/menu/top_app_bar_sources_other.xml" value="0.371875" />
         <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.3880208333333333" />
         <entry key="..\:/Users/jjcr1/AndroidStudioProjects/Rss/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.3880208333333333" />
+        <entry key="..\:/Users/jjcr1/AndroidStudioProjects/rss-kotlin/app/src/main/res/drawable/ic_menu.xml" value="0.205" />
+        <entry key="..\:/Users/jjcr1/AndroidStudioProjects/rss-kotlin/app/src/main/res/layout/activity_main.xml" value="0.3625" />
+        <entry key="..\:/Users/jjcr1/AndroidStudioProjects/rss-kotlin/app/src/main/res/layout/activity_post.xml" value="0.3625" />
+        <entry key="..\:/Users/jjcr1/AndroidStudioProjects/rss-kotlin/app/src/main/res/layout/feed_item.xml" value="0.3625" />
+        <entry key="..\:/Users/jjcr1/AndroidStudioProjects/rss-kotlin/app/src/main/res/menu/top_app_bar.xml" value="0.3625" />
       </map>
     </option>
   </component>

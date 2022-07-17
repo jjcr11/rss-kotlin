@@ -3,39 +3,28 @@ package com.reader.rss
 import android.content.Context
 import android.content.Intent
 import android.database.sqlite.SQLiteConstraintException
-import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.WorkRequest
 import com.reader.rss.databinding.ActivityMainBinding
 import kotlinx.coroutines.*
-import org.xmlpull.v1.XmlPullParserException
-import java.io.IOException
 import java.io.InputStream
 import java.io.Serializable
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var feedAdapter: FeedAdapter
     private lateinit var linearLayoutManager: RecyclerView.LayoutManager
-    private val context = this
     private var flag: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,16 +32,6 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val uploadWorkRequest: WorkRequest =
-            PeriodicWorkRequestBuilder<UploadWorker>(6, TimeUnit.HOURS)
-                .build()
-
-        WorkManager
-            .getInstance(this)
-            .enqueue(uploadWorkRequest)
-
-        //Hide the action bar by default
-        supportActionBar?.hide()
         binding.cpi.visibility = View.GONE
 
         val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
@@ -77,7 +56,9 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
             adapter = feedAdapter
         }
 
-        deleteData()
+        CoroutineScope(Dispatchers.IO).launch {
+            deleteData()
+        }
         getData(sharedPreference.getBoolean("sort", true))
 
         //If the recycler view scrolls then floating action button extends or shrinks
@@ -102,12 +83,12 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         with(binding.nv.menu) {
 
             getItem(0).setOnMenuItemClickListener {
-                startActivity(Intent(context, SettingsActivity::class.java))
+                startActivity(Intent(baseContext, SettingsActivity::class.java))
                 true
             }
 
             getItem(1).setOnMenuItemClickListener {
-                startActivity(Intent(context, SavedActivity::class.java))
+                startActivity(Intent(baseContext, SavedActivity::class.java))
                 true
             }
 
@@ -144,89 +125,61 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
     }
 
     private fun deleteData() {
-        Thread {
-            try {
-                val sources = com.reader.rss.DatabaseApplication.database.dao().getAllSources()
-                for(source in sources) {
-                    val feedsById = com.reader.rss.DatabaseApplication.database.dao().getFeedsId(source.id)
-                    var count = 0
-                    var size = feedsById.size
-                    while(size > 26) {
-                        com.reader.rss.DatabaseApplication.database.dao().deleteFeedById(feedsById[count])
-                        size -= 1
-                        count += 1
-                    }
-                }
-            } catch (e: Exception) {
-                Log.d("DeleteData", e.toString())
+        val sources = DatabaseApplication.database.dao().getAllSources()
+        for(source in sources) {
+            val feedsById = DatabaseApplication.database.dao().getFeedsId(source.id)
+            var count = 0
+            var size = feedsById.size
+            while(size > 26) {
+                DatabaseApplication.database.dao().deleteFeedById(feedsById[count])
+                size -= 1
+                count += 1
             }
-        }.start()
+        }
     }
 
     private fun getData(sort: Boolean) {
-        val sources: MutableList<SourceEntity>
-        val cm = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
-        val isConnected: Boolean = activeNetwork?.isConnectedOrConnecting == true
-        if(isConnected) {
-            runBlocking(Dispatchers.IO) {
-                sources = com.reader.rss.DatabaseApplication.database.dao().getAllSources()
+        var sources: MutableList<SourceEntity> = mutableListOf()
+        CoroutineScope(Dispatchers.IO).launch {
+            val asyncJob = async {
+                sources = DatabaseApplication.database.dao().getAllSources()
             }
-            if(sources.size > 0) {
-                if(flag) {
+            asyncJob.await()
+            if(flag) {
+                CoroutineScope(Dispatchers.Main).launch {
                     binding.cpi.visibility = View.VISIBLE
                 }
-                for(source: SourceEntity in sources) {
-                    downloadXmlTask(source.url, source.id, sort)
-                }
             }
-        } else {
-            Toast.makeText(this, "No internet connection", Toast.LENGTH_SHORT).show()
-            binding.srl.isEnabled = false
-            getFeeds(sort)
+            for(source in sources) {
+                downloadXmlTask(source.url, source.id, sort)
+            }
         }
     }
 
     private fun downloadXmlTask(url: String?, id: Int, sort: Boolean) {
-        var feeds: List<FeedEntity> = mutableListOf()
-        GlobalScope.launch {
-            feeds = loadXmlFromNetwork(url, id)
-            runBlocking(Dispatchers.IO) {
-                for(feed in feeds) {
-                    try {
-                        com.reader.rss.DatabaseApplication.database.dao().addFeed(feed)
-                    } catch (e: SQLiteConstraintException) {
-                        Log.d("DownloadXmlTask", e.toString())
-                    }
-                }
+        val feeds = loadXmlFromNetwork(url, id)
+        for(feed in feeds) {
+            try {
+                DatabaseApplication.database.dao().addFeed(feed)
+            } catch (e: SQLiteConstraintException) {
+
             }
-            runBlocking(Dispatchers.Main) {
-                try {
-                    getFeeds(sort)
-                    binding.mtb.menu.getItem(0).title = feedAdapter.itemCount.toString()
-                } catch (e: Exception) {
-                    Log.d("DownloadGetFeeds", e.toString())
-                }
-            }
+        }
+        CoroutineScope(Dispatchers.Main).launch {
+            getFeeds(sort)
+            binding.mtb.menu.getItem(0).title = feedAdapter.itemCount.toString()
         }
     }
 
-    @Throws(XmlPullParserException::class, IOException::class)
-    private suspend fun loadXmlFromNetwork(urlString: String?, sourceId: Int): List<FeedEntity> {
-        var feeds = listOf<FeedEntity>()
-        try {
-            feeds = withContext(Dispatchers.IO) {
-                downloadUrl(urlString)?.use { stream ->
-                    XmlParser().parse(stream, sourceId)
-                }!!
-            }
-        } catch (e: Exception) {
 
-         }
+    private fun loadXmlFromNetwork(urlString: String?, sourceId: Int): List<FeedEntity> {
+        var feeds = listOf<FeedEntity>()
+        downloadUrl(urlString)?.use { stream ->
+            feeds = XmlParser().parse(stream, sourceId)
+        }!!
         return feeds
     }
 
-    @Throws(IOException::class)
     private fun downloadUrl(urlString: String?): InputStream? {
         val url = URL(urlString)
         return (url.openConnection() as? HttpURLConnection)?.run {
@@ -240,19 +193,24 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
     }
 
     private fun getFeeds(sort: Boolean) {
-        var feeds: MutableList<FullFeedEntity>
-        runBlocking(Dispatchers.IO) {
-            feeds = if(sort) {
-                com.reader.rss.DatabaseApplication.database.dao().getUnreadFeeds()
-            } else {
-                com.reader.rss.DatabaseApplication.database.dao().getUnreadFeedsDesc()
+        var feeds: MutableList<FullFeedEntity> = mutableListOf()
+        CoroutineScope(Dispatchers.IO).launch {
+            val asyncJob = async {
+                feeds = if(sort) {
+                    DatabaseApplication.database.dao().getUnreadFeeds()
+                } else {
+                    DatabaseApplication.database.dao().getUnreadFeedsDesc()
+                }
+            }
+            asyncJob.await()
+            CoroutineScope(Dispatchers.Main).launch {
+                if (flag) {
+                    binding.cpi.visibility = View.GONE
+                }
+                binding.srl.isRefreshing = false
+                feedAdapter.setFeeds(feeds)
             }
         }
-        if(flag) {
-            binding.cpi.visibility = View.GONE
-        }
-        binding.srl.isRefreshing = false
-        feedAdapter.setFeeds(feeds)
     }
 
     override fun onClick(feed: FullFeedEntity, position: Int) {
