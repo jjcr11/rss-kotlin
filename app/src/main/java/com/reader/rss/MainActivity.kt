@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
             binding.dl.openDrawer(GravityCompat.START)
         }
 
-        with(binding.nv.menu) {
+        binding.nv.menu.apply {
 
             getItem(0).setOnMenuItemClickListener {
                 startActivity(Intent(baseContext, SettingsActivity::class.java))
@@ -167,7 +167,6 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         }
         CoroutineScope(Dispatchers.Main).launch {
             getFeeds(sort)
-            binding.mtb.menu.getItem(0).title = feedAdapter.itemCount.toString()
         }
     }
 
@@ -209,6 +208,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
                 }
                 binding.srl.isRefreshing = false
                 feedAdapter.setFeeds(feeds)
+                binding.mtb.menu.getItem(0).title = feedAdapter.itemCount.toString()
             }
         }
     }

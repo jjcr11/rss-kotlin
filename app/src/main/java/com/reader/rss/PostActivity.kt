@@ -5,33 +5,30 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.reader.rss.databinding.ActivityPostBinding
 import androidx.core.content.ContextCompat
-import com.google.android.material.button.MaterialButton
-
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 class PostActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPostBinding
     private lateinit var postAdapter: PostAdapter
-    private val context = this
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPostBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        supportActionBar?.hide()
-
         val list: MutableList<FullFeedEntity> = intent.getSerializableExtra("list") as MutableList<FullFeedEntity>
         val position: Int = intent.getIntExtra("position", 0)
 
         val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
-        //val align = sharedPreference.getInt("align", R.id.mbtnLeft)
-        //Log.d("ALIGN", R.id.mbtnLeft.toString())
+
         postAdapter = PostAdapter(
             list,
             sharedPreference.getInt("size", 24),
@@ -49,48 +46,69 @@ class PostActivity : AppCompatActivity() {
         binding.vp.setPageTransformer { _, _ ->
             var url = ""
             var saved = false
-            val t1 = Thread {
-                com.reader.rss.DatabaseApplication.database.dao().setFeedAsRead(list[binding.vp.currentItem].id)
-                saved = com.reader.rss.DatabaseApplication.database.dao().getFeedSaved(list[binding.vp.currentItem].id)
-                url = com.reader.rss.DatabaseApplication.database.dao().getFeedUrl(list[binding.vp.currentItem].id)
-            }
-            t1.start()
-            t1.join()
-            with(binding.mtb.menu.getItem(0)) {
-                isChecked = saved
-                icon = if(saved) {
-                    ContextCompat.getDrawable(context, R.drawable.ic_bookmark)
-                } else {
-                    ContextCompat.getDrawable(context, R.drawable.ic_bookmark_border)
+
+            CoroutineScope(Dispatchers.IO).launch {
+                val async1 = async {
+                    DatabaseApplication.database.dao().setFeedAsRead(list[binding.vp.currentItem].id)
+                    saved = DatabaseApplication.database.dao().getFeedSaved(list[binding.vp.currentItem].id)
+                    url = DatabaseApplication.database.dao().getFeedUrl(list[binding.vp.currentItem].id)
                 }
-                setOnMenuItemClickListener {
-                    binding.mtb.menu.getItem(0).isChecked = !binding.mtb.menu.getItem(0).isChecked
-                    val t2 = Thread {
-                        com.reader.rss.DatabaseApplication.database.dao().setFeedAsSavedOrUnsaved(list[binding.vp.currentItem].id, binding.mtb.menu.getItem(0).isChecked)
+                async1.await()
+                binding.mtb.menu.apply {
+                    getItem(0).apply {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            isChecked = saved
+                            icon = if (saved) {
+                                ContextCompat.getDrawable(baseContext, R.drawable.ic_bookmark)
+                            } else {
+                                ContextCompat.getDrawable(baseContext, R.drawable.ic_bookmark_border)
+                            }
+                        }
+                        setOnMenuItemClickListener {
+                            this.isChecked = !this.isChecked
+                            CoroutineScope(Dispatchers.IO).launch {
+                                val async2 = async {
+                                    DatabaseApplication.database.dao().setFeedAsSavedOrUnsaved(
+                                        list[binding.vp.currentItem].id,
+                                        binding.mtb.menu.getItem(0).isChecked
+                                    )
+                                }
+                                async2.await()
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    binding.mtb.menu.getItem(0).icon =
+                                        if (binding.mtb.menu.getItem(0).isChecked) {
+                                            ContextCompat.getDrawable(
+                                                baseContext,
+                                                R.drawable.ic_bookmark
+                                            )
+                                        } else {
+                                            ContextCompat.getDrawable(
+                                                baseContext,
+                                                R.drawable.ic_bookmark_border
+                                            )
+                                        }
+                                }
+                            }
+                            true
+                        }
                     }
-                    t2.start()
-                    t2.join()
-                    binding.mtb.menu.getItem(0).icon = if(binding.mtb.menu.getItem(0).isChecked) {
-                        ContextCompat.getDrawable(context, R.drawable.ic_bookmark)
-                    } else {
-                        ContextCompat.getDrawable(context, R.drawable.ic_bookmark_border)
+                    getItem(1).apply {
+                        setOnMenuItemClickListener {
+                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                            true
+                        }
                     }
-                    true
-                }
-            }
-            with(binding.mtb.menu) {
-                getItem(1).setOnMenuItemClickListener {
-                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                    true
-                }
-                getItem(2).setOnMenuItemClickListener {
-                    val sendIntent: Intent = Intent().apply {
-                        action = Intent.ACTION_SEND
-                        putExtra(Intent.EXTRA_TEXT, url)
-                        type = "text/plain"
+                    getItem(2).apply {
+                        setOnMenuItemClickListener {
+                            val sendIntent: Intent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_TEXT, url)
+                                type = "text/plain"
+                            }
+                            startActivity(Intent.createChooser(sendIntent, null))
+                            true
+                        }
                     }
-                    startActivity(Intent.createChooser(sendIntent, null))
-                    true
                 }
             }
         }
