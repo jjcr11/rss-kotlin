@@ -3,13 +3,19 @@ package com.reader.rss
 import android.content.Context
 import android.content.Intent
 import android.database.sqlite.SQLiteConstraintException
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.core.content.getSystemService
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -139,20 +145,35 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
     }
 
     private fun getData(sort: Boolean) {
-        var sources: MutableList<SourceEntity> = mutableListOf()
-        CoroutineScope(Dispatchers.IO).launch {
-            val asyncJob = async {
-                sources = DatabaseApplication.database.dao().getAllSources()
-            }
-            asyncJob.await()
-            if(flag) {
-                CoroutineScope(Dispatchers.Main).launch {
-                    binding.cpi.visibility = View.VISIBLE
+        val connectivityManager = baseContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = connectivityManager.activeNetworkInfo
+        val isConnected: Boolean = activeNetwork?.isConnectedOrConnecting == true
+        if(isConnected) {
+            var sources: MutableList<SourceEntity> = mutableListOf()
+            CoroutineScope(Dispatchers.IO).launch {
+                val asyncJob = async {
+                    sources = DatabaseApplication.database.dao().getAllSources()
+                }
+                asyncJob.await()
+                if(flag) {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        binding.cpi.visibility = View.VISIBLE
+                    }
+                }
+                if(sources.size == 0) {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        binding.cpi.visibility = View.GONE
+                        binding.srl.isRefreshing = false
+                    }
+                } else {
+                    for (source in sources) {
+                        downloadXmlTask(source.url, source.id, sort)
+                    }
                 }
             }
-            for(source in sources) {
-                downloadXmlTask(source.url, source.id, sort)
-            }
+        } else {
+            getFeeds(sort)
+            Toast.makeText(this, "No internet connection", Toast.LENGTH_SHORT).show()
         }
     }
 

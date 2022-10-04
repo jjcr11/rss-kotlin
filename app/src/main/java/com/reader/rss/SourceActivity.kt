@@ -1,5 +1,7 @@
 package com.reader.rss
 
+import android.content.Context
+import android.net.ConnectivityManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.transition.Scene
@@ -77,29 +79,37 @@ class SourceActivity : AppCompatActivity() {
     }
 
     private fun downloadXmlTask(url: String) {
-        binding.cpi.visibility = View.VISIBLE
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val newSource = SourceEntity(
-                    name = loadXmlFromNetwork(url),
-                    url = viewOtherSourceBar.findViewById<TextInputEditText>(R.id.tiBar).text.toString()
-                )
-                DatabaseApplication.database.dao().addSource(newSource)
-                CoroutineScope(Dispatchers.Main).launch {
-                    binding.cpi.visibility = View.GONE
-                    sourceAdapter.add(newSource)
-                }
-            } catch(e: MalformedURLException) {
-                CoroutineScope(Dispatchers.Main).launch {
-                    binding.cpi.visibility = View.GONE
-                    Toast.makeText(baseContext, "Invalid url", Toast.LENGTH_SHORT).show()
-                }
-            } catch(e: XmlPullParserException) {
-                CoroutineScope(Dispatchers.Main).launch {
-                    binding.cpi.visibility = View.GONE
-                    Toast.makeText(baseContext, "Rss feeds not found", Toast.LENGTH_SHORT).show()
+        val connectivityManager = baseContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = connectivityManager.activeNetworkInfo
+        val isConnected: Boolean = activeNetwork?.isConnectedOrConnecting == true
+        if(isConnected) {
+            binding.cpi.visibility = View.VISIBLE
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val newSource = SourceEntity(
+                        name = loadXmlFromNetwork(url),
+                        url = viewOtherSourceBar.findViewById<TextInputEditText>(R.id.tiBar).text.toString()
+                    )
+                    DatabaseApplication.database.dao().addSource(newSource)
+                    CoroutineScope(Dispatchers.Main).launch {
+                        binding.cpi.visibility = View.GONE
+                        sourceAdapter.add(newSource)
+                    }
+                } catch (e: MalformedURLException) {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        binding.cpi.visibility = View.GONE
+                        Toast.makeText(baseContext, "Invalid url", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: XmlPullParserException) {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        binding.cpi.visibility = View.GONE
+                        Toast.makeText(baseContext, "Rss feeds not found", Toast.LENGTH_SHORT)
+                            .show()
+                    }
                 }
             }
+        } else {
+            Toast.makeText(this, "No internet connection", Toast.LENGTH_SHORT).show()
         }
     }
 
