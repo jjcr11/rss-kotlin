@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.reader.rss.databinding.ActivitySettingsBinding
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.jsoup.Jsoup
 
 class SettingsActivity : AppCompatActivity() {
@@ -23,6 +24,14 @@ class SettingsActivity : AppCompatActivity() {
         binding.sSize.value = sharedPreference.getInt("size", 24).toFloat()
         binding.sLineHeight.value = sharedPreference.getInt("lineHeight", 24).toFloat()
         binding.sCornerRadius.value = sharedPreference.getInt("cornerRadius", 0).toFloat()
+        binding.tvDeleteAfter.text = when(sharedPreference.getInt("indexDays", 2)) {
+            0 -> "After 1 day"
+            1 -> "After 2 days"
+            2 -> "After 5 days"
+            3 -> "After 10 days"
+            4 -> "After 15 days"
+            else -> "Never"
+        }
 
 
         binding.tvValueSize.text = binding.sSize.value.toInt().toString()
@@ -30,6 +39,8 @@ class SettingsActivity : AppCompatActivity() {
         binding.tvValueCornerRadius.text = binding.sCornerRadius.value.toInt().toString()
 
         binding.cv.radius = binding.sCornerRadius.value
+
+
 
         var align = sharedPreference.getString("align", "Left")
         when (align) {
@@ -164,11 +175,28 @@ class SettingsActivity : AppCompatActivity() {
             sharedPreference.edit().putBoolean("theme", isChecked).apply()
         }
 
+        binding.cvDelete.setOnClickListener {
+            val fruits = arrayOf("After 1 day", "After 2 days", "After 5 days", "After 10 days",
+                "After 15 days", "Never")
+            MaterialAlertDialogBuilder(this)
+                .setTitle("Delete unread feeds")
+                .setSingleChoiceItems(fruits, sharedPreference.getInt("indexDays", 2)) { _, index ->
+                    binding.tvDeleteAfter.text = fruits[index]
+                    sharedPreference.edit().putInt("indexDays", index).apply()
+                }
+                .setPositiveButton("Accept") { _, _ ->
+
+                }
+                .show()
+        }
+
         binding.mbtnReset.setOnClickListener {
             binding.sSize.value = 24f
             binding.sLineHeight.value = 24f
             binding.sCornerRadius.value = 0f
             binding.sm.isChecked = false
+            binding.tvDeleteAfter.text = "After 5 days"
+            sharedPreference.edit().putInt("indexDays", 2).apply()
         }
     }
 }

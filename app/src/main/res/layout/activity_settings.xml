@@ -282,6 +282,46 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="@id/tvTheme"/>
 
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cvDelete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvTheme"
+            app:cardElevation="0dp"
+            android:backgroundTint="@color/white">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/tvDelete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Delete unread feeds"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/common_default"
+                    android:textStyle="bold"
+                    android:layout_marginVertical="@dimen/common_default"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <TextView
+                    android:id="@+id/tvDeleteAfter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="After 5 days"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/common_default"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toTopOf="@id/tvDelete"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <TextView
             android:id="@+id/tvWarning"
             android:layout_width="wrap_content"
@@ -290,8 +330,8 @@
             android:textColor="@color/red"
             android:textSize="@dimen/common_min"
             android:layout_marginVertical="@dimen/common_default"
-            app:layout_constraintStart_toStartOf="@id/tvTheme"
-            app:layout_constraintTop_toBottomOf="@id/tvTheme"/>
+            app:layout_constraintStart_toStartOf="@id/cvDelete"
+            app:layout_constraintTop_toBottomOf="@id/cvDelete"/>
 
         <View
             android:id="@+id/divider2"

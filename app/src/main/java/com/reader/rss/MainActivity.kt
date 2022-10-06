@@ -4,27 +4,26 @@ import android.content.Context
 import android.content.Intent
 import android.database.sqlite.SQLiteConstraintException
 import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import android.net.NetworkRequest
 import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
-import androidx.core.content.getSystemService
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.reader.rss.databinding.ActivityMainBinding
 import kotlinx.coroutines.*
 import java.io.InputStream
 import java.io.Serializable
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
 
@@ -39,6 +38,12 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         setContentView(binding.root)
 
         binding.cpi.visibility = View.GONE
+
+        val workRequest = PeriodicWorkRequestBuilder<DeleteOldDataWorker>(1, TimeUnit.DAYS)
+            .build()
+        WorkManager
+            .getInstance(this)
+            .enqueue(workRequest)
 
         val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
         if(sharedPreference.getBoolean("theme", false)) {
