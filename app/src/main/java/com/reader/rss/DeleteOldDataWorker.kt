@@ -1,6 +1,7 @@
 package com.reader.rss
 
 import android.content.Context
+import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import java.util.*
@@ -28,12 +29,17 @@ class DeleteOldDataWorker(
 
             val currentDay = Calendar.getInstance().time
             val actuallyDay = Date(currentDay.time - (86400000 * day))
-            val feeds = DatabaseApplication.database.dao().getOldFeeds()
+            val feeds = DatabaseApplication.database.dao().getUnreadFeeds()
+
+            //var count = 0
+
             feeds.forEach {
                 if(actuallyDay.time > it.date!!.time) {
+                    //count++
                     DatabaseApplication.database.dao().setFeedAsRead(it.id)
                 }
             }
+            //Log.d("COUNTTTTTTTT", "$count")
         }
     }
 }

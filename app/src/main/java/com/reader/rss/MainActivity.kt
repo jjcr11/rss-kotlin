@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
@@ -138,13 +139,13 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
     private fun deleteData() {
         val sources = DatabaseApplication.database.dao().getAllSources()
         for(source in sources) {
+            Log.d("SOURCEEES", "${source.name}, ${source.count}")
             val feedsById = DatabaseApplication.database.dao().getFeedsId(source.id)
-            var count = 0
-            var size = feedsById.size
-            while(size > 26) {
-                DatabaseApplication.database.dao().deleteFeedById(feedsById[count])
-                size -= 1
-                count += 1
+            if(feedsById.size > source.count) {
+                val subList = feedsById.subList(0, (feedsById.size - source.count))
+                for(sub in subList) {
+                    DatabaseApplication.database.dao().deleteFeedById(sub)
+                }
             }
         }
     }
@@ -184,6 +185,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
 
     private fun downloadXmlTask(url: String?, id: Int, sort: Boolean) {
         val feeds = loadXmlFromNetwork(url, id)
+        DatabaseApplication.database.dao().setSourceCount(id, feeds.size)
         for(feed in feeds) {
             try {
                 DatabaseApplication.database.dao().addFeed(feed)

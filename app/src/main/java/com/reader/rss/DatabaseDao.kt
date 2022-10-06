@@ -55,6 +55,6 @@ interface DatabaseDao {
     @Query("SELECT * FROM FeedEntity WHERE sourceId = :id")
     fun getAllFeedsById(id: Int): MutableList<FeedEntity>
 
-    @Query("SELECT * from FeedEntity WHERE read = 0")
-    fun getOldFeeds(): MutableList<FeedEntity>
+    @Query("UPDATE SourceEntity SET count = :count WHERE id = :id")
+    fun setSourceCount(id: Int, count: Int)
 }
