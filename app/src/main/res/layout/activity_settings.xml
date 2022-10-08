@@ -322,6 +322,35 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cvExportImport"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cvDelete"
+            app:cardElevation="0dp"
+            android:backgroundTint="@color/white">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/tvExportImport"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Export / Import Data"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/common_default"
+                    android:textStyle="bold"
+                    android:layout_marginVertical="@dimen/common_default"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <TextView
             android:id="@+id/tvWarning"
             android:layout_width="wrap_content"
@@ -330,8 +359,8 @@
             android:textColor="@color/red"
             android:textSize="@dimen/common_min"
             android:layout_marginVertical="@dimen/common_default"
-            app:layout_constraintStart_toStartOf="@id/cvDelete"
-            app:layout_constraintTop_toBottomOf="@id/cvDelete"/>
+            app:layout_constraintStart_toStartOf="@id/cvExportImport"
+            app:layout_constraintTop_toBottomOf="@id/cvExportImport"/>
 
         <View
             android:id="@+id/divider2"

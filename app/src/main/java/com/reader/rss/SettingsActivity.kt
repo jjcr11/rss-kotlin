@@ -1,12 +1,25 @@
 package com.reader.rss
 
 import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import com.reader.rss.databinding.ActivitySettingsBinding
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.reader.rss.databinding.ActivitySettingsBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.jsoup.Jsoup
+import java.io.File
+import java.lang.reflect.Type
+import java.util.*
+
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -176,18 +189,51 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.cvDelete.setOnClickListener {
+            var i = 0
             val fruits = arrayOf("After 1 day", "After 2 days", "After 5 days", "After 10 days",
                 "After 15 days", "Never")
             MaterialAlertDialogBuilder(this)
                 .setTitle("Delete unread feeds")
                 .setSingleChoiceItems(fruits, sharedPreference.getInt("indexDays", 2)) { _, index ->
-                    binding.tvDeleteAfter.text = fruits[index]
-                    sharedPreference.edit().putInt("indexDays", index).apply()
+                    i = index
                 }
                 .setPositiveButton("Accept") { _, _ ->
-
+                    binding.tvDeleteAfter.text = fruits[i]
+                    sharedPreference.edit().putInt("indexDays", i).apply()
                 }
                 .show()
+        }
+
+        binding.cvExportImport.setOnClickListener {
+            CoroutineScope(Dispatchers.IO).launch {
+                val auxList: MutableList<SourceXFeed> = mutableListOf()
+                val sources = DatabaseApplication.database.dao().getAllSources()
+                for(source in sources) {
+                    val aux = SourceXFeed(
+                        source.id,
+                        source.name!!,
+                        source.url!!,
+                        source.count,
+                    )
+                    val feeds = DatabaseApplication.database.dao().getAllFeedsById(source.id)
+                    for(feed in feeds) {
+                        aux.feeds.add(feed)
+                    }
+                    auxList.add(aux)
+                }
+                val content: String = Gson().toJson(auxList)
+                val listType: Type = object : TypeToken<MutableList<SourceXFeed?>?>() {}.type
+                val yourClassList: List<SourceXFeed> = Gson().fromJson(content, listType)
+
+                val file = File(baseContext.filesDir, "data.json")
+                file.writeText(content)
+                val shareIntent: Intent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(baseContext, baseContext.applicationContext.packageName + ".provider", file))
+                    type = "text/json"
+                }
+                startActivity(Intent.createChooser(shareIntent, null))
+            }
         }
 
         binding.mbtnReset.setOnClickListener {
