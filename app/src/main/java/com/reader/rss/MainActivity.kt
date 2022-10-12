@@ -21,7 +21,6 @@ import androidx.work.WorkManager
 import com.reader.rss.databinding.ActivityMainBinding
 import kotlinx.coroutines.*
 import java.io.InputStream
-import java.io.Serializable
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.concurrent.TimeUnit
@@ -243,8 +242,9 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
 
     override fun onClick(feed: FullFeedEntity, position: Int) {
         val postActivity = Intent(this, PostActivity::class.java)
-        postActivity.putExtra("list", feedAdapter.getFeeds() as Serializable)
         postActivity.putExtra("position", position)
+        val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
+        postActivity.putExtra("sort", sharedPreference.getBoolean("sort", true))
         startActivity(postActivity)
     }
 }

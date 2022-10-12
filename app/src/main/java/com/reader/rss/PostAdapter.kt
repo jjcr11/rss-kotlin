@@ -1,13 +1,10 @@
 package com.reader.rss
 
 import android.content.Context
-import android.util.Log
-import android.view.FrameMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.ViewPager2
 import com.reader.rss.databinding.PostItemBinding
 import org.jsoup.Jsoup
 
@@ -90,5 +87,10 @@ class PostAdapter(
 
     override fun getItemCount(): Int {
         return posts.size
+    }
+
+    fun setPosts(posts: MutableList<FullFeedEntity>) {
+        this.posts = posts
+        notifyDataSetChanged()
     }
 }

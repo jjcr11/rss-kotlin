@@ -37,10 +37,10 @@ interface DatabaseDao {
     @Query("SELECT id FROM FeedEntity WHERE sourceId = :id and read = 1 and saved = 0 ORDER BY date")
     fun getFeedsId(id: Int): MutableList<Int>
 
-    @Query("SELECT FeedEntity.id, title, name as source, date, author, content FROM FeedEntity INNER JOIN SourceEntity ON FeedEntity.sourceId = SourceEntity.id  WHERE FeedEntity.read = 0 ORDER BY date LIMIT 50")
+    @Query("SELECT FeedEntity.id, title, name as source, date, author, content FROM FeedEntity INNER JOIN SourceEntity ON FeedEntity.sourceId = SourceEntity.id  WHERE FeedEntity.read = 0 ORDER BY date")
     fun getUnreadFeeds(): MutableList<FullFeedEntity>
 
-    @Query("SELECT FeedEntity.id, title, name as source, date, author, content FROM FeedEntity INNER JOIN SourceEntity ON FeedEntity.sourceId = SourceEntity.id  WHERE FeedEntity.read = 0 ORDER BY date DESC LIMIT 50")
+    @Query("SELECT FeedEntity.id, title, name as source, date, author, content FROM FeedEntity INNER JOIN SourceEntity ON FeedEntity.sourceId = SourceEntity.id  WHERE FeedEntity.read = 0 ORDER BY date DESC")
     fun getUnreadFeedsDesc(): MutableList<FullFeedEntity>
 
     @Query("UPDATE FeedEntity set saved = :saved where id = :id")

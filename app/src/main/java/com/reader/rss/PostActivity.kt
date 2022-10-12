@@ -9,28 +9,23 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.reader.rss.databinding.ActivityPostBinding
 import androidx.core.content.ContextCompat
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class PostActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPostBinding
     private lateinit var postAdapter: PostAdapter
+    private lateinit var list: MutableList<FullFeedEntity>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPostBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val list: MutableList<FullFeedEntity> = intent.getSerializableExtra("list") as MutableList<FullFeedEntity>
-        val position: Int = intent.getIntExtra("position", 0)
-
         val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
 
         postAdapter = PostAdapter(
-            list,
+            mutableListOf(),
             sharedPreference.getInt("size", 24),
             sharedPreference.getBoolean("theme", false),
             sharedPreference.getInt("lineHeight", 24),
@@ -39,9 +34,10 @@ class PostActivity : AppCompatActivity() {
 
         binding.vp.apply {
             adapter = postAdapter
-            currentItem = position
             reduceDragSensitivity()
         }
+
+        getFeeds()
 
         binding.vp.setPageTransformer { _, _ ->
             var url = ""
@@ -112,6 +108,28 @@ class PostActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun getFeeds() {
+        val position: Int = intent.getIntExtra("position", 0)
+        val sort: Boolean = intent.getBooleanExtra("sort", false)
+        CoroutineScope(Dispatchers.IO).launch {
+            val asyncJob = async {
+                list = if(sort) {
+                    DatabaseApplication.database.dao().getUnreadFeeds()
+                } else {
+                    DatabaseApplication.database.dao().getUnreadFeedsDesc()
+                }
+
+            }
+            asyncJob.await()
+            CoroutineScope(Dispatchers.Main).launch {
+                postAdapter.setPosts(list)
+                binding.vp.currentItem = position
+                delay(1000)
+            }
+        }
+
     }
 }
 
