@@ -27,7 +27,7 @@ class PostActivity : AppCompatActivity() {
         postAdapter = PostAdapter(
             mutableListOf(),
             sharedPreference.getInt("size", 24),
-            sharedPreference.getBoolean("theme", false),
+            intent.getIntExtra("theme", -14408668),
             sharedPreference.getInt("lineHeight", 24),
             sharedPreference.getString("align", "Left")!!
         )

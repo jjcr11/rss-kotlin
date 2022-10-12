@@ -8,7 +8,6 @@ import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
@@ -46,10 +45,10 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
             .enqueue(workRequest)
 
         val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
-        if(sharedPreference.getBoolean("theme", false)) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        when(sharedPreference.getInt("theme", 2)) {
+            0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            2 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
         }
 
         binding.mtb.menu.getItem(1).icon = if(sharedPreference.getBoolean("sort", true)) {
@@ -138,7 +137,6 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
     private fun deleteData() {
         val sources = DatabaseApplication.database.dao().getAllSources()
         for(source in sources) {
-            Log.d("SOURCEEES", "${source.name}, ${source.count}")
             val feedsById = DatabaseApplication.database.dao().getFeedsId(source.id)
             if(feedsById.size > source.count) {
                 val subList = feedsById.subList(0, (feedsById.size - source.count))
@@ -242,9 +240,10 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
 
     override fun onClick(feed: FullFeedEntity, position: Int) {
         val postActivity = Intent(this, PostActivity::class.java)
-        postActivity.putExtra("position", position)
         val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
+        postActivity.putExtra("position", position)
         postActivity.putExtra("sort", sharedPreference.getBoolean("sort", true))
+        postActivity.putExtra("theme", binding.fabe.currentTextColor)
         startActivity(postActivity)
     }
 }

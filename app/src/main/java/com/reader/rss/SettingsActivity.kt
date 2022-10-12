@@ -11,6 +11,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.google.android.material.button.MaterialButton
@@ -102,6 +103,11 @@ class SettingsActivity : AppCompatActivity() {
             4 -> "After 15 days"
             else -> "Never"
         }
+        binding.tvThemeSystem.text = when(sharedPreference.getInt("theme", 2)) {
+            0 -> "Yes"
+            1 -> "No"
+            else -> "System"
+        }
 
 
         binding.tvValueSize.text = binding.sSize.value.toInt().toString()
@@ -128,9 +134,23 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-        binding.sm.isChecked = sharedPreference.getBoolean("theme", false)
-        val background = if(binding.sm.isChecked) { "rgb(36, 36, 36)" } else { "rgb(255, 255, 255)" }
-        val text = if(binding.sm.isChecked) { "rgb(255, 255, 255)" } else { "rgb(36, 36, 36)" }
+        val background: String
+        val text: String
+
+        when(binding.tvThemeSystem.currentTextColor) {
+            -14408668 -> {
+                background = "rgb(255, 255, 255)"
+                text = "rgb(36, 36, 36)"
+            }
+            else -> {
+                background = "rgb(36, 36, 36)"
+                text = "rgb(255, 255, 255)"
+            }
+        }
+
+        sharedPreference.edit().putString("background", background).apply()
+
+
 
         val body = Jsoup.parse("<h1>Title</h1>")
         body.append("<div class=\"source\">Source / Unknown</div>")
@@ -241,21 +261,37 @@ class SettingsActivity : AppCompatActivity() {
             sharedPreference.edit().putInt("cornerRadius", value.toInt()).apply()
         }
 
-        binding.sm.setOnCheckedChangeListener { _, isChecked ->
-            sharedPreference.edit().putBoolean("theme", isChecked).apply()
-        }
-
-        binding.cvDelete.setOnClickListener {
-            var i = 0
-            val fruits = arrayOf("After 1 day", "After 2 days", "After 5 days", "After 10 days",
-                "After 15 days", "Never")
+        binding.cvTheme.setOnClickListener {
+            var i = sharedPreference.getInt("theme", 2)
+            val options = arrayOf("Yes", "No", "System")
             MaterialAlertDialogBuilder(this)
-                .setTitle("Delete unread feeds")
-                .setSingleChoiceItems(fruits, sharedPreference.getInt("indexDays", 2)) { _, index ->
+                .setTitle("Night theme")
+                .setSingleChoiceItems(options, i) { _, index ->
                     i = index
                 }
                 .setPositiveButton("Accept") { _, _ ->
-                    binding.tvDeleteAfter.text = fruits[i]
+                    when(i) {
+                        0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                        1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                        2 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                    }
+                    binding.tvThemeSystem.text = options[i]
+                    sharedPreference.edit().putInt("theme", i).apply()
+                }
+                .show()
+        }
+
+        binding.cvDelete.setOnClickListener {
+            var i = sharedPreference.getInt("indexDays", 2)
+            val time = arrayOf("After 1 day", "After 2 days", "After 5 days", "After 10 days",
+                "After 15 days", "Never")
+            MaterialAlertDialogBuilder(this)
+                .setTitle("Delete unread feeds")
+                .setSingleChoiceItems(time, i) { _, index ->
+                    i = index
+                }
+                .setPositiveButton("Accept") { _, _ ->
+                    binding.tvDeleteAfter.text = time[i]
                     sharedPreference.edit().putInt("indexDays", i).apply()
                 }
                 .show()
@@ -327,7 +363,6 @@ class SettingsActivity : AppCompatActivity() {
             binding.sSize.value = 24f
             binding.sLineHeight.value = 24f
             binding.sCornerRadius.value = 0f
-            binding.sm.isChecked = false
             binding.tvDeleteAfter.text = "After 5 days"
             sharedPreference.edit().putInt("indexDays", 2).apply()
         }

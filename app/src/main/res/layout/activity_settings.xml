@@ -262,32 +262,52 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <TextView
-            android:id="@+id/tvTheme"
-            android:layout_width="wrap_content"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cvTheme"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/dark_theme"
-            android:textColor="@color/black"
-            android:textSize="@dimen/common_default"
-            android:layout_marginTop="@dimen/common_default"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="@id/cv"
-            app:layout_constraintTop_toBottomOf="@id/cv"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cv"
+            app:cardElevation="0dp"
+            android:backgroundTint="@color/white">
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/sm"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="@id/tvTheme"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/tvTheme"/>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/tvTheme"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Night theme"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/common_default"
+                    android:textStyle="bold"
+                    android:layout_marginVertical="@dimen/common_default"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <TextView
+                    android:id="@+id/tvThemeSystem"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="System"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/common_default"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toTopOf="@id/tvTheme"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cvDelete"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvTheme"
+            app:layout_constraintTop_toBottomOf="@id/cvTheme"
             app:cardElevation="0dp"
             android:backgroundTint="@color/white">
 

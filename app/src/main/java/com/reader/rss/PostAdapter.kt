@@ -11,7 +11,7 @@ import org.jsoup.Jsoup
 class PostAdapter(
     private var posts: MutableList<FullFeedEntity>,
     private var size: Int,
-    theme: Boolean,
+    theme: Int,
     private var lineHeight: Int,
     private var align: String
 ): RecyclerView.Adapter<PostAdapter.ViewHolder>() {
@@ -19,9 +19,9 @@ class PostAdapter(
     private lateinit var context: Context
     private val r = Regex("""style *= *".*"""")
     private val r2 = Regex("#")
-    private val blue = if(theme) { "rgb(12, 75, 87)" } else { "rgb(119, 216, 236)" }
-    private val background = if(theme) { "rgb(36, 36, 36)" } else { "rgb(255, 255, 255)" }
-    private val text = if(theme) { "rgb(255, 255, 255)" } else { "rgb(36, 36, 36)" }
+    private val blue = if(theme != -14408668) { "rgb(12, 75, 87)" } else { "rgb(119, 216, 236)" }
+    private val background = if(theme != -14408668) { "rgb(36, 36, 36)" } else { "rgb(255, 255, 255)" }
+    private val text = if(theme != -14408668) { "rgb(255, 255, 255)" } else { "rgb(36, 36, 36)" }
 
     inner class ViewHolder(view: View):RecyclerView.ViewHolder(view) {
         val binding = PostItemBinding.bind(view)
