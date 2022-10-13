@@ -112,15 +112,17 @@ class PostActivity : AppCompatActivity() {
 
     private fun getFeeds() {
         val position: Int = intent.getIntExtra("position", 0)
+        val saved: Boolean = intent.getBooleanExtra("saved", false)
         val sort: Boolean = intent.getBooleanExtra("sort", false)
         CoroutineScope(Dispatchers.IO).launch {
             val asyncJob = async {
-                list = if(sort) {
+                list = if(saved) {
+                    DatabaseApplication.database.dao().getAllFeedsSaved()
+                } else if(sort) {
                     DatabaseApplication.database.dao().getUnreadFeeds()
                 } else {
                     DatabaseApplication.database.dao().getUnreadFeedsDesc()
                 }
-
             }
             asyncJob.await()
             CoroutineScope(Dispatchers.Main).launch {

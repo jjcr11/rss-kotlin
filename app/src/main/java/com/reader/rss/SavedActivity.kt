@@ -4,17 +4,11 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.widget.Toast
-import androidx.core.content.ContextCompat
-import androidx.core.view.allViews
-import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.reader.rss.databinding.ActivityMainBinding
 import com.google.android.material.appbar.MaterialToolbar
-import java.io.Serializable
 
 class SavedActivity : AppCompatActivity(), FeedAdapterOnClickListener {
 
@@ -51,8 +45,7 @@ class SavedActivity : AppCompatActivity(), FeedAdapterOnClickListener {
     private fun getFeeds() {
         var feeds: MutableList<FullFeedEntity> = mutableListOf()
         val t = Thread {
-            feeds = com.reader.rss.DatabaseApplication.database.dao().getAllFeedsSaved()
-
+            feeds = DatabaseApplication.database.dao().getAllFeedsSaved()
         }
         t.start()
         t.join()
@@ -74,8 +67,9 @@ class SavedActivity : AppCompatActivity(), FeedAdapterOnClickListener {
 
     override fun onClick(feed: FullFeedEntity, position: Int) {
         val postActivity = Intent(this, PostActivity::class.java)
-        postActivity.putExtra("list", feedAdapter.getFeeds() as Serializable)
         postActivity.putExtra("position", position)
+        postActivity.putExtra("saved", true)
+        postActivity.putExtra("theme", intent.getIntExtra("theme", -14408668))
         startActivity(postActivity)
     }
 }

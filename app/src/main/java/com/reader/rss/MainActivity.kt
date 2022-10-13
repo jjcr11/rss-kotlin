@@ -91,14 +91,15 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         }
 
         binding.nv.menu.apply {
-
             getItem(0).setOnMenuItemClickListener {
                 startActivity(Intent(baseContext, SettingsActivity::class.java))
                 true
             }
 
             getItem(1).setOnMenuItemClickListener {
-                startActivity(Intent(baseContext, SavedActivity::class.java))
+                val savedActivity = Intent(baseContext, SavedActivity::class.java)
+                savedActivity.putExtra("theme", binding.fabe.currentTextColor)
+                startActivity(savedActivity)
                 true
             }
 
