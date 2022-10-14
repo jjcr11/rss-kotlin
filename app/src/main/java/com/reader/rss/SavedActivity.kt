@@ -24,7 +24,6 @@ class SavedActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         supportActionBar?.hide()
         binding.fabe.hide()
         binding.mtb.visibility = View.GONE
-        binding.cpi.visibility = View.GONE
         binding.root.removeView(binding.nv)
         binding.srl.isEnabled = false
 

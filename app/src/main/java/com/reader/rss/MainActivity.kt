@@ -9,9 +9,11 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.view.ViewTreeObserver
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -29,14 +31,34 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
     private lateinit var binding: ActivityMainBinding
     private lateinit var feedAdapter: FeedAdapter
     private lateinit var linearLayoutManager: RecyclerView.LayoutManager
-    private var flag: Boolean = true
+    private var ready: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.cpi.visibility = View.GONE
+        val content: View = findViewById(android.R.id.content)
+        content.viewTreeObserver.addOnPreDrawListener(
+            object : ViewTreeObserver.OnPreDrawListener {
+                override fun onPreDraw(): Boolean {
+                    return if (ready) {
+                        content.viewTreeObserver.removeOnPreDrawListener(this)
+                        true
+                    } else {
+                        false
+                    }
+                }
+            }
+        )
+
+
+
+
+
+
+
 
         val workRequest = PeriodicWorkRequestBuilder<DeleteOldDataWorker>(1, TimeUnit.DAYS)
             .build()
@@ -130,7 +152,6 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         }
 
         binding.srl.setOnRefreshListener {
-            flag = false
             getData(sharedPreference.getBoolean("sort", true))
         }
     }
@@ -159,14 +180,9 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
                     sources = DatabaseApplication.database.dao().getAllSources()
                 }
                 asyncJob.await()
-                if(flag) {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        binding.cpi.visibility = View.VISIBLE
-                    }
-                }
                 if(sources.size == 0) {
                     CoroutineScope(Dispatchers.Main).launch {
-                        binding.cpi.visibility = View.GONE
+                        ready = true
                         binding.srl.isRefreshing = false
                     }
                 } else {
@@ -229,12 +245,10 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
             }
             asyncJob.await()
             CoroutineScope(Dispatchers.Main).launch {
-                if (flag) {
-                    binding.cpi.visibility = View.GONE
-                }
                 binding.srl.isRefreshing = false
                 feedAdapter.setFeeds(feeds)
                 binding.mtb.menu.getItem(0).title = feedAdapter.itemCount.toString()
+                ready = true
             }
         }
     }
