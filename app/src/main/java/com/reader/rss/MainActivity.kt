@@ -2,6 +2,7 @@ package com.reader.rss
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.database.sqlite.SQLiteConstraintException
 import android.net.ConnectivityManager
 import android.net.Uri
@@ -31,6 +32,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
     private lateinit var binding: ActivityMainBinding
     private lateinit var feedAdapter: FeedAdapter
     private lateinit var linearLayoutManager: RecyclerView.LayoutManager
+    private lateinit var sharedPreference: SharedPreferences
     private var ready: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,20 +55,13 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
             }
         )
 
-
-
-
-
-
-
-
         val workRequest = PeriodicWorkRequestBuilder<DeleteOldDataWorker>(1, TimeUnit.DAYS)
             .build()
         WorkManager
             .getInstance(this)
             .enqueue(workRequest)
 
-        val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
+        sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
         when(sharedPreference.getInt("theme", 2)) {
             0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -154,6 +149,10 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         binding.srl.setOnRefreshListener {
             getData(sharedPreference.getBoolean("sort", true))
         }
+    }
+    override fun onResume() {
+        super.onResume()
+        getFeeds(sharedPreference.getBoolean("sort", true))
     }
 
     private fun deleteData() {
@@ -255,7 +254,6 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
 
     override fun onClick(feed: FullFeedEntity, position: Int) {
         val postActivity = Intent(this, PostActivity::class.java)
-        val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
         postActivity.putExtra("position", position)
         postActivity.putExtra("sort", sharedPreference.getBoolean("sort", true))
         postActivity.putExtra("theme", binding.fabe.currentTextColor)
