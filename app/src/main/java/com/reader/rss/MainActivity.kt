@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.reader.rss.databinding.ActivityMainBinding
+import com.reader.rss.databinding.OnBoardingBinding
 import kotlinx.coroutines.*
 import java.io.InputStream
 import java.net.HttpURLConnection
@@ -33,13 +34,39 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
     private lateinit var feedAdapter: FeedAdapter
     private lateinit var linearLayoutManager: RecyclerView.LayoutManager
     private lateinit var sharedPreference: SharedPreferences
+    private lateinit var onBoardingBinding: OnBoardingBinding
     private var ready: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        onBoardingBinding = OnBoardingBinding.inflate(layoutInflater)
+
+        sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
+
+        if(sharedPreference.getBoolean("onBoarding", false)) {
+            setContentView(binding.root)
+        } else {
+            setContentView(onBoardingBinding.root)
+            val pages = 5
+            onBoardingBinding.vp.adapter = OnBoardingAdapter(this, pages)
+            onBoardingBinding.vp.isUserInputEnabled = false
+            onBoardingBinding.mcvNext.setOnClickListener {
+                if (onBoardingBinding.vp.currentItem == pages - 1) {
+                    setContentView(binding.root)
+                    sharedPreference.edit().putBoolean("onBoarding", true).apply()
+                } else {
+                    onBoardingBinding.vp.currentItem = onBoardingBinding.vp.currentItem + 1
+                }
+            }
+            onBoardingBinding.mcvPrev.setOnClickListener {
+                onBoardingBinding.vp.currentItem = onBoardingBinding.vp.currentItem - 1
+            }
+        }
+
+
+
 
         val content: View = findViewById(android.R.id.content)
         content.viewTreeObserver.addOnPreDrawListener(
@@ -61,7 +88,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
             .getInstance(this)
             .enqueue(workRequest)
 
-        sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
+
         when(sharedPreference.getInt("theme", 2)) {
             0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
