@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
@@ -19,9 +20,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.reader.rss.databinding.ActivitySettingsBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 import java.io.File
 import java.io.InputStreamReader
@@ -41,29 +40,36 @@ class SettingsActivity : AppCompatActivity() {
 
             val sourceXFeeds: List<SourceXFeed> = Gson().fromJson(inputStreamReader.readText(), sourceXFeedType)
             CoroutineScope(Dispatchers.IO).launch {
-                for(source in sourceXFeeds) {
+                val async = async {
+                    for(source in sourceXFeeds) {
 
-                    val s = SourceEntity(
-                        source.id,
-                        source.name,
-                        source.url,
-                        source.count
-                    )
-                    DatabaseApplication.database.dao().addSource(s)
-                    for(feed in source.feeds) {
-                        val f = FeedEntity(
-                            feed.id,
-                            feed.title,
-                            feed.url,
-                            feed.author,
-                            feed.date,
-                            feed.content,
-                            feed.sourceId,
-                            feed.read,
-                            feed.saved
+                        val s = SourceEntity(
+                            source.id,
+                            source.name,
+                            source.url,
+                            source.count
                         )
-                        DatabaseApplication.database.dao().addFeed(f)
-                    }
+                        DatabaseApplication.database.dao().addSource(s)
+                        for(feed in source.feeds) {
+                            val f = FeedEntity(
+                                feed.id,
+                                feed.title,
+                                feed.url,
+                                feed.author,
+                                feed.date,
+                                feed.content,
+                                feed.sourceId,
+                                feed.read,
+                                feed.saved
+                            )
+                            DatabaseApplication.database.dao().addFeed(f)
+                        }
+                }
+
+                }
+                async.await()
+                CoroutineScope(Dispatchers.Main).launch {
+                    Toast.makeText(baseContext, "Successfully", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -341,6 +347,7 @@ class SettingsActivity : AppCompatActivity() {
                                         Manifest.permission.READ_EXTERNAL_STORAGE
                                     ) == PackageManager.PERMISSION_GRANTED -> {
                                         activityResultLaunch.launch(openIntent)
+                                        //Toast.makeText(baseContext, "Successfully", Toast.LENGTH_SHORT).show()
                                     }
                                     shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE) -> {
                                         requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -351,6 +358,7 @@ class SettingsActivity : AppCompatActivity() {
                                 }
                             } else {
                                 activityResultLaunch.launch(openIntent)
+                                //Toast.makeText(baseContext, "Successfully", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
