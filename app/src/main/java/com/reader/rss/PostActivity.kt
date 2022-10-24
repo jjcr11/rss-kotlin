@@ -1,14 +1,13 @@
 package com.reader.rss
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.ViewPager2
 import com.reader.rss.databinding.ActivityPostBinding
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import kotlinx.coroutines.*
 
 class PostActivity : AppCompatActivity() {
@@ -22,15 +21,7 @@ class PostActivity : AppCompatActivity() {
         binding = ActivityPostBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
-
-        postAdapter = PostAdapter(
-            mutableListOf(),
-            sharedPreference.getInt("size", 24),
-            intent.getIntExtra("theme", -14408668),
-            sharedPreference.getInt("lineHeight", 24),
-            sharedPreference.getString("align", "Left")!!
-        )
+        postAdapter = PostAdapter(this, mutableListOf())
 
         binding.vp.apply {
             adapter = postAdapter
@@ -126,12 +117,10 @@ class PostActivity : AppCompatActivity() {
             }
             asyncJob.await()
             CoroutineScope(Dispatchers.Main).launch {
-                postAdapter.setPosts(list)
+                postAdapter.setList(list)
                 binding.vp.currentItem = position
-                delay(1000)
             }
         }
-
     }
 }
 
