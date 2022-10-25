@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
@@ -39,9 +40,9 @@ class SettingsActivity : AppCompatActivity() {
             val sourceXFeedType = object : TypeToken<MutableList<SourceXFeed?>?>() {}.type
 
             val sourceXFeeds: List<SourceXFeed> = Gson().fromJson(inputStreamReader.readText(), sourceXFeedType)
-            CoroutineScope(Dispatchers.IO).launch {
-                val async = async {
-                    for(source in sourceXFeeds) {
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    for (source in sourceXFeeds) {
 
                         val s = SourceEntity(
                             source.id,
@@ -50,7 +51,7 @@ class SettingsActivity : AppCompatActivity() {
                             source.count
                         )
                         DatabaseApplication.database.dao().addSource(s)
-                        for(feed in source.feeds) {
+                        for (feed in source.feeds) {
                             val f = FeedEntity(
                                 feed.id,
                                 feed.title,
@@ -64,13 +65,9 @@ class SettingsActivity : AppCompatActivity() {
                             )
                             DatabaseApplication.database.dao().addFeed(f)
                         }
+                    }
                 }
-
-                }
-                async.await()
-                CoroutineScope(Dispatchers.Main).launch {
-                    Toast.makeText(baseContext, "Successfully", Toast.LENGTH_SHORT).show()
-                }
+                Toast.makeText(baseContext, "Successfully", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -309,7 +306,7 @@ class SettingsActivity : AppCompatActivity() {
                 .setItems(actions) { _, index ->
                     when(index) {
                         0 -> {
-                            CoroutineScope(Dispatchers.IO).launch {
+                            lifecycleScope.launch(Dispatchers.IO) {
                                 val auxList: MutableList<SourceXFeed> = mutableListOf()
                                 val sources = DatabaseApplication.database.dao().getAllSources()
                                 for(source in sources) {
@@ -347,7 +344,6 @@ class SettingsActivity : AppCompatActivity() {
                                         Manifest.permission.READ_EXTERNAL_STORAGE
                                     ) == PackageManager.PERMISSION_GRANTED -> {
                                         activityResultLaunch.launch(openIntent)
-                                        //Toast.makeText(baseContext, "Successfully", Toast.LENGTH_SHORT).show()
                                     }
                                     shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE) -> {
                                         requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -358,7 +354,6 @@ class SettingsActivity : AppCompatActivity() {
                                 }
                             } else {
                                 activityResultLaunch.launch(openIntent)
-                                //Toast.makeText(baseContext, "Successfully", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }

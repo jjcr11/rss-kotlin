@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.GravityCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.PeriodicWorkRequestBuilder
@@ -110,10 +111,8 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
             adapter = feedAdapter
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
-            deleteData()
-        }
-        getData(sharedPreference.getBoolean("sort", true))
+        deleteData()
+        getData()
 
         //If the recycler view scrolls then floating action button extends or shrinks
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -174,7 +173,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         }
 
         binding.srl.setOnRefreshListener {
-            getData(sharedPreference.getBoolean("sort", true))
+            getData()
         }
     }
     override fun onResume() {
@@ -183,68 +182,66 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
     }
 
     private fun deleteData() {
-        val sources = DatabaseApplication.database.dao().getAllSources()
-        for(source in sources) {
-            val feedsById = DatabaseApplication.database.dao().getFeedsId(source.id)
-            if(feedsById.size > source.count) {
-                val subList = feedsById.subList(0, (feedsById.size - source.count))
-                for(sub in subList) {
-                    DatabaseApplication.database.dao().deleteFeedById(sub)
+        lifecycleScope.launch(Dispatchers.IO) {
+            val sources = DatabaseApplication.database.dao().getAllSources()
+            for(source in sources) {
+                val feedsById = DatabaseApplication.database.dao().getFeedsId(source.id)
+                if(feedsById.size > source.count) {
+                    val subList = feedsById.subList(0, (feedsById.size - source.count))
+                    for(sub in subList) {
+                        DatabaseApplication.database.dao().deleteFeedById(sub)
+                    }
                 }
             }
         }
     }
 
-    private fun getData(sort: Boolean) {
+    private fun getData() {
         val connectivityManager = baseContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork = connectivityManager.activeNetworkInfo
         val isConnected: Boolean = activeNetwork?.isConnectedOrConnecting == true
         if(isConnected) {
-            var sources: MutableList<SourceEntity> = mutableListOf()
-            CoroutineScope(Dispatchers.IO).launch {
-                val asyncJob = async {
-                    sources = DatabaseApplication.database.dao().getAllSources()
+            lifecycleScope.launch {
+                val sources = withContext(Dispatchers.IO) {
+                    DatabaseApplication.database.dao().getAllSources()
                 }
-                asyncJob.await()
                 if(sources.size == 0) {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        ready = true
-                        binding.srl.isRefreshing = false
-                    }
+                    ready = true
+                    binding.srl.isRefreshing = false
                 } else {
                     for (source in sources) {
-                        downloadXmlTask(source.url, source.id, sort)
+                        downloadXmlTask(source.url, source.id)
                     }
                 }
+                getFeeds(sharedPreference.getBoolean("sort", true))
             }
         } else {
-            getFeeds(sort)
+            getFeeds(sharedPreference.getBoolean("sort", true))
             Toast.makeText(this, "No internet connection", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun downloadXmlTask(url: String?, id: Int, sort: Boolean) {
+    private suspend fun downloadXmlTask(url: String?, id: Int) {
         val feeds = loadXmlFromNetwork(url, id)
-        DatabaseApplication.database.dao().setSourceCount(id, feeds.size)
-        for(feed in feeds) {
-            try {
-                DatabaseApplication.database.dao().addFeed(feed)
-            } catch (e: SQLiteConstraintException) {
+        withContext(Dispatchers.IO) {
+            DatabaseApplication.database.dao().setSourceCount(id, feeds.size)
+            for(feed in feeds) {
+                try {
+                    DatabaseApplication.database.dao().addFeed(feed)
+                } catch (e: SQLiteConstraintException) {
 
+                }
             }
-        }
-        CoroutineScope(Dispatchers.Main).launch {
-            getFeeds(sort)
         }
     }
 
 
-    private fun loadXmlFromNetwork(urlString: String?, sourceId: Int): List<FeedEntity> {
-        var feeds = listOf<FeedEntity>()
-        downloadUrl(urlString)?.use { stream ->
-            feeds = XmlParser().parse(stream, sourceId)
-        }!!
-        return feeds
+    private suspend fun loadXmlFromNetwork(urlString: String?, sourceId: Int): List<FeedEntity> {
+        return withContext(Dispatchers.IO) {
+            downloadUrl(urlString)?.use { stream ->
+                XmlParser().parse(stream, sourceId)
+            }!!
+        }
     }
 
     private fun downloadUrl(urlString: String?): InputStream? {
@@ -260,22 +257,18 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
     }
 
     private fun getFeeds(sort: Boolean) {
-        var feeds: MutableList<FullFeedEntity> = mutableListOf()
-        CoroutineScope(Dispatchers.IO).launch {
-            val asyncJob = async {
-                feeds = if(sort) {
+        lifecycleScope.launch {
+            val feeds = withContext(Dispatchers.IO) {
+                if(sort) {
                     DatabaseApplication.database.dao().getUnreadFeeds()
                 } else {
                     DatabaseApplication.database.dao().getUnreadFeedsDesc()
                 }
             }
-            asyncJob.await()
-            CoroutineScope(Dispatchers.Main).launch {
-                binding.srl.isRefreshing = false
-                feedAdapter.setFeeds(feeds)
-                binding.mtb.menu.getItem(0).title = feedAdapter.itemCount.toString()
-                ready = true
-            }
+            binding.srl.isRefreshing = false
+            feedAdapter.setFeeds(feeds)
+            binding.mtb.menu.getItem(0).title = feedAdapter.itemCount.toString()
+            ready = true
         }
     }
 

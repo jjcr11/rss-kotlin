@@ -10,6 +10,7 @@ import android.transition.TransitionInflater
 import android.transition.TransitionManager
 import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.reader.rss.databinding.ActivitySourcesBinding
@@ -72,7 +73,7 @@ class SourceActivity : AppCompatActivity() {
 
     //Function to get sources into the database
     private fun getSources() {
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             val sources = DatabaseApplication.database.dao().getAllSources()
             sourceAdapter.setSources(sources)
         }
@@ -84,28 +85,23 @@ class SourceActivity : AppCompatActivity() {
         val isConnected: Boolean = activeNetwork?.isConnectedOrConnecting == true
         if(isConnected) {
             binding.cpi.visibility = View.VISIBLE
-            CoroutineScope(Dispatchers.IO).launch {
+            lifecycleScope.launch {
                 try {
-                    val newSource = SourceEntity(
-                        name = loadXmlFromNetwork(url),
-                        url = viewOtherSourceBar.findViewById<TextInputEditText>(R.id.tiBar).text.toString()
-                    )
+                    val newSource = withContext(Dispatchers.IO) {
+                        SourceEntity(
+                            name = loadXmlFromNetwork(url),
+                            url = viewOtherSourceBar.findViewById<TextInputEditText>(R.id.tiBar).text.toString()
+                        )
+                    }
                     DatabaseApplication.database.dao().addSource(newSource)
-                    CoroutineScope(Dispatchers.Main).launch {
-                        binding.cpi.visibility = View.GONE
-                        sourceAdapter.add(newSource)
-                    }
+                    binding.cpi.visibility = View.GONE
+                    sourceAdapter.add(newSource)
                 } catch (e: MalformedURLException) {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        binding.cpi.visibility = View.GONE
-                        Toast.makeText(baseContext, "Invalid url", Toast.LENGTH_SHORT).show()
-                    }
+                    binding.cpi.visibility = View.GONE
+                    Toast.makeText(baseContext, "Invalid url", Toast.LENGTH_SHORT).show()
                 } catch (e: XmlPullParserException) {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        binding.cpi.visibility = View.GONE
-                        Toast.makeText(baseContext, "Rss feeds not found", Toast.LENGTH_SHORT)
-                            .show()
-                    }
+                    binding.cpi.visibility = View.GONE
+                    Toast.makeText(baseContext, "Rss feeds not found", Toast.LENGTH_SHORT).show()
                 }
             }
         } else {

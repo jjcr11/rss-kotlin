@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.reader.rss.databinding.ActivityPostBinding
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import kotlinx.coroutines.*
@@ -31,72 +32,66 @@ class PostActivity : AppCompatActivity() {
         getFeeds()
 
         binding.vp.setPageTransformer { _, _ ->
-            var url = ""
-            var saved = false
-
-            CoroutineScope(Dispatchers.IO).launch {
-                val async1 = async {
+            lifecycleScope.launch {
+                var url: String
+                var saved: Boolean
+                withContext(Dispatchers.IO) {
                     DatabaseApplication.database.dao().setFeedAsRead(list[binding.vp.currentItem].id)
                     saved = DatabaseApplication.database.dao().getFeedSaved(list[binding.vp.currentItem].id)
                     url = DatabaseApplication.database.dao().getFeedUrl(list[binding.vp.currentItem].id)
                 }
-                async1.await()
-                binding.mtb.menu.apply {
-                    getItem(0).apply {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            isChecked = saved
-                            icon = if (saved) {
-                                ContextCompat.getDrawable(baseContext, R.drawable.ic_bookmark)
-                            } else {
-                                ContextCompat.getDrawable(baseContext, R.drawable.ic_bookmark_border)
-                            }
-                        }
-                        setOnMenuItemClickListener {
-                            this.isChecked = !this.isChecked
-                            CoroutineScope(Dispatchers.IO).launch {
-                                val async2 = async {
-                                    DatabaseApplication.database.dao().setFeedAsSavedOrUnsaved(
-                                        list[binding.vp.currentItem].id,
-                                        binding.mtb.menu.getItem(0).isChecked
-                                    )
-                                }
-                                async2.await()
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    binding.mtb.menu.getItem(0).icon =
-                                        if (binding.mtb.menu.getItem(0).isChecked) {
-                                            ContextCompat.getDrawable(
-                                                baseContext,
-                                                R.drawable.ic_bookmark
-                                            )
-                                        } else {
-                                            ContextCompat.getDrawable(
-                                                baseContext,
-                                                R.drawable.ic_bookmark_border
-                                            )
-                                        }
-                                }
-                            }
-                            true
-                        }
-                    }
-                    getItem(1).apply {
-                        setOnMenuItemClickListener {
-                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                            true
-                        }
-                    }
-                    getItem(2).apply {
-                        setOnMenuItemClickListener {
-                            val sendIntent: Intent = Intent().apply {
-                                action = Intent.ACTION_SEND
-                                putExtra(Intent.EXTRA_TEXT, url)
-                                type = "text/plain"
-                            }
-                            startActivity(Intent.createChooser(sendIntent, null))
-                            true
-                        }
+                saveButtonSetup(saved)
+                binding.mtb.menu.getItem(1).let {
+                    it.setOnMenuItemClickListener {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                        true
                     }
                 }
+                binding.mtb.menu.getItem(2).let {
+                    it.setOnMenuItemClickListener {
+                        val sendIntent: Intent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, url)
+                            type = "text/plain"
+                        }
+                        startActivity(Intent.createChooser(sendIntent, null))
+                        true
+                    }
+                }
+            }
+        }
+    }
+
+    private fun saveButtonSetup(saved: Boolean) {
+        binding.mtb.menu.getItem(0).let {
+            it.isChecked = saved
+            it.icon = if (saved) {
+                ContextCompat.getDrawable(baseContext, R.drawable.ic_bookmark)
+            } else {
+                ContextCompat.getDrawable(baseContext, R.drawable.ic_bookmark_border)
+            }
+            it.setOnMenuItemClickListener {
+                lifecycleScope.launch {
+                    it.isChecked = !it.isChecked
+                    withContext(Dispatchers.IO) {
+                        DatabaseApplication.database.dao().setFeedAsSavedOrUnsaved(
+                            list[binding.vp.currentItem].id,
+                            it.isChecked
+                        )
+                    }
+                    it.icon = if (binding.mtb.menu.getItem(0).isChecked) {
+                        ContextCompat.getDrawable(
+                            baseContext,
+                            R.drawable.ic_bookmark
+                        )
+                    } else {
+                        ContextCompat.getDrawable(
+                            baseContext,
+                            R.drawable.ic_bookmark_border
+                        )
+                    }
+                }
+                true
             }
         }
     }
