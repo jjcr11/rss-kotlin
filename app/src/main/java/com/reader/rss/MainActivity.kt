@@ -2,30 +2,29 @@ package com.reader.rss
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.database.sqlite.SQLiteConstraintException
 import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
+import android.view.ViewTreeObserver
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.GravityCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import androidx.work.WorkRequest
 import com.reader.rss.databinding.ActivityMainBinding
+import com.reader.rss.databinding.OnBoardingBinding
 import kotlinx.coroutines.*
-import org.xmlpull.v1.XmlPullParserException
-import java.io.IOException
 import java.io.InputStream
-import java.io.Serializable
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.concurrent.TimeUnit
@@ -35,31 +34,66 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
     private lateinit var binding: ActivityMainBinding
     private lateinit var feedAdapter: FeedAdapter
     private lateinit var linearLayoutManager: RecyclerView.LayoutManager
-    private val context = this
-    private var flag: Boolean = true
+    private lateinit var sharedPreference: SharedPreferences
+    private lateinit var onBoardingBinding: OnBoardingBinding
+    private var ready: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        onBoardingBinding = OnBoardingBinding.inflate(layoutInflater)
 
-        val uploadWorkRequest: WorkRequest =
-            PeriodicWorkRequestBuilder<UploadWorker>(6, TimeUnit.HOURS)
-                .build()
+        sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
 
+        if(sharedPreference.getBoolean("onBoarding", false)) {
+            setContentView(binding.root)
+        } else {
+            setContentView(onBoardingBinding.root)
+            val pages = 5
+            onBoardingBinding.vp.adapter = OnBoardingAdapter(this, pages)
+            onBoardingBinding.vp.isUserInputEnabled = false
+            onBoardingBinding.mcvNext.setOnClickListener {
+                if (onBoardingBinding.vp.currentItem == pages - 1) {
+                    setContentView(binding.root)
+                    sharedPreference.edit().putBoolean("onBoarding", true).apply()
+                } else {
+                    onBoardingBinding.vp.currentItem = onBoardingBinding.vp.currentItem + 1
+                }
+            }
+            onBoardingBinding.mcvPrev.setOnClickListener {
+                onBoardingBinding.vp.currentItem = onBoardingBinding.vp.currentItem - 1
+            }
+        }
+
+
+
+
+        val content: View = findViewById(android.R.id.content)
+        content.viewTreeObserver.addOnPreDrawListener(
+            object : ViewTreeObserver.OnPreDrawListener {
+                override fun onPreDraw(): Boolean {
+                    return if (ready) {
+                        content.viewTreeObserver.removeOnPreDrawListener(this)
+                        true
+                    } else {
+                        false
+                    }
+                }
+            }
+        )
+
+        val workRequest = PeriodicWorkRequestBuilder<DeleteOldDataWorker>(1, TimeUnit.DAYS)
+            .build()
         WorkManager
             .getInstance(this)
-            .enqueue(uploadWorkRequest)
+            .enqueue(workRequest)
 
-        //Hide the action bar by default
-        supportActionBar?.hide()
-        binding.cpi.visibility = View.GONE
 
-        val sharedPreference = getSharedPreferences("settings", Context.MODE_PRIVATE)
-        if(sharedPreference.getBoolean("theme", false)) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        when(sharedPreference.getInt("theme", 2)) {
+            0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            2 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
         }
 
         binding.mtb.menu.getItem(1).icon = if(sharedPreference.getBoolean("sort", true)) {
@@ -78,7 +112,7 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         }
 
         deleteData()
-        getData(sharedPreference.getBoolean("sort", true))
+        getData()
 
         //If the recycler view scrolls then floating action button extends or shrinks
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -99,15 +133,16 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
             binding.dl.openDrawer(GravityCompat.START)
         }
 
-        with(binding.nv.menu) {
-
+        binding.nv.menu.apply {
             getItem(0).setOnMenuItemClickListener {
-                startActivity(Intent(context, SettingsActivity::class.java))
+                startActivity(Intent(baseContext, SettingsActivity::class.java))
                 true
             }
 
             getItem(1).setOnMenuItemClickListener {
-                startActivity(Intent(context, SavedActivity::class.java))
+                val savedActivity = Intent(baseContext, SavedActivity::class.java)
+                savedActivity.putExtra("theme", binding.fabe.currentTextColor)
+                startActivity(savedActivity)
                 true
             }
 
@@ -138,95 +173,77 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
         }
 
         binding.srl.setOnRefreshListener {
-            flag = false
-            getData(sharedPreference.getBoolean("sort", true))
+            getData()
         }
+    }
+    override fun onResume() {
+        super.onResume()
+        getFeeds(sharedPreference.getBoolean("sort", true))
     }
 
     private fun deleteData() {
-        Thread {
-            try {
-                val sources = com.reader.rss.DatabaseApplication.database.dao().getAllSources()
-                for(source in sources) {
-                    val feedsById = com.reader.rss.DatabaseApplication.database.dao().getFeedsId(source.id)
-                    var count = 0
-                    var size = feedsById.size
-                    while(size > 26) {
-                        com.reader.rss.DatabaseApplication.database.dao().deleteFeedById(feedsById[count])
-                        size -= 1
-                        count += 1
+        lifecycleScope.launch(Dispatchers.IO) {
+            val sources = DatabaseApplication.database.dao().getAllSources()
+            for(source in sources) {
+                val feedsById = DatabaseApplication.database.dao().getFeedsId(source.id)
+                if(feedsById.size > source.count) {
+                    val subList = feedsById.subList(0, (feedsById.size - source.count))
+                    for(sub in subList) {
+                        DatabaseApplication.database.dao().deleteFeedById(sub)
                     }
                 }
-            } catch (e: Exception) {
-                Log.d("DeleteData", e.toString())
             }
-        }.start()
+        }
     }
 
-    private fun getData(sort: Boolean) {
-        val sources: MutableList<SourceEntity>
-        val cm = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
+    private fun getData() {
+        val connectivityManager = baseContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = connectivityManager.activeNetworkInfo
         val isConnected: Boolean = activeNetwork?.isConnectedOrConnecting == true
         if(isConnected) {
-            runBlocking(Dispatchers.IO) {
-                sources = com.reader.rss.DatabaseApplication.database.dao().getAllSources()
-            }
-            if(sources.size > 0) {
-                if(flag) {
-                    binding.cpi.visibility = View.VISIBLE
+            lifecycleScope.launch {
+                val sources = withContext(Dispatchers.IO) {
+                    DatabaseApplication.database.dao().getAllSources()
                 }
-                for(source: SourceEntity in sources) {
-                    downloadXmlTask(source.url, source.id, sort)
-                }
-            }
-        } else {
-            Toast.makeText(this, "No internet connection", Toast.LENGTH_SHORT).show()
-            binding.srl.isEnabled = false
-            getFeeds(sort)
-        }
-    }
-
-    private fun downloadXmlTask(url: String?, id: Int, sort: Boolean) {
-        var feeds: List<FeedEntity> = mutableListOf()
-        GlobalScope.launch {
-            feeds = loadXmlFromNetwork(url, id)
-            runBlocking(Dispatchers.IO) {
-                for(feed in feeds) {
-                    try {
-                        com.reader.rss.DatabaseApplication.database.dao().addFeed(feed)
-                    } catch (e: SQLiteConstraintException) {
-                        Log.d("DownloadXmlTask", e.toString())
+                if(sources.size == 0) {
+                    ready = true
+                    binding.srl.isRefreshing = false
+                } else {
+                    for (source in sources) {
+                        downloadXmlTask(source.url, source.id)
                     }
                 }
+                getFeeds(sharedPreference.getBoolean("sort", true))
             }
-            runBlocking(Dispatchers.Main) {
+        } else {
+            getFeeds(sharedPreference.getBoolean("sort", true))
+            Toast.makeText(this, "No internet connection", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private suspend fun downloadXmlTask(url: String?, id: Int) {
+        val feeds = loadXmlFromNetwork(url, id)
+        withContext(Dispatchers.IO) {
+            DatabaseApplication.database.dao().setSourceCount(id, feeds.size)
+            for(feed in feeds) {
                 try {
-                    getFeeds(sort)
-                    binding.mtb.menu.getItem(0).title = feedAdapter.itemCount.toString()
-                } catch (e: Exception) {
-                    Log.d("DownloadGetFeeds", e.toString())
+                    DatabaseApplication.database.dao().addFeed(feed)
+                } catch (e: SQLiteConstraintException) {
+
                 }
             }
         }
     }
 
-    @Throws(XmlPullParserException::class, IOException::class)
-    private suspend fun loadXmlFromNetwork(urlString: String?, sourceId: Int): List<FeedEntity> {
-        var feeds = listOf<FeedEntity>()
-        try {
-            feeds = withContext(Dispatchers.IO) {
-                downloadUrl(urlString)?.use { stream ->
-                    XmlParser().parse(stream, sourceId)
-                }!!
-            }
-        } catch (e: Exception) {
 
-         }
-        return feeds
+    private suspend fun loadXmlFromNetwork(urlString: String?, sourceId: Int): List<FeedEntity> {
+        return withContext(Dispatchers.IO) {
+            downloadUrl(urlString)?.use { stream ->
+                XmlParser().parse(stream, sourceId)
+            }!!
+        }
     }
 
-    @Throws(IOException::class)
     private fun downloadUrl(urlString: String?): InputStream? {
         val url = URL(urlString)
         return (url.openConnection() as? HttpURLConnection)?.run {
@@ -240,25 +257,26 @@ class MainActivity : AppCompatActivity(), FeedAdapterOnClickListener {
     }
 
     private fun getFeeds(sort: Boolean) {
-        var feeds: MutableList<FullFeedEntity>
-        runBlocking(Dispatchers.IO) {
-            feeds = if(sort) {
-                com.reader.rss.DatabaseApplication.database.dao().getUnreadFeeds()
-            } else {
-                com.reader.rss.DatabaseApplication.database.dao().getUnreadFeedsDesc()
+        lifecycleScope.launch {
+            val feeds = withContext(Dispatchers.IO) {
+                if(sort) {
+                    DatabaseApplication.database.dao().getUnreadFeeds()
+                } else {
+                    DatabaseApplication.database.dao().getUnreadFeedsDesc()
+                }
             }
+            binding.srl.isRefreshing = false
+            feedAdapter.setFeeds(feeds)
+            binding.mtb.menu.getItem(0).title = feedAdapter.itemCount.toString()
+            ready = true
         }
-        if(flag) {
-            binding.cpi.visibility = View.GONE
-        }
-        binding.srl.isRefreshing = false
-        feedAdapter.setFeeds(feeds)
     }
 
     override fun onClick(feed: FullFeedEntity, position: Int) {
         val postActivity = Intent(this, PostActivity::class.java)
-        postActivity.putExtra("list", feedAdapter.getFeeds() as Serializable)
         postActivity.putExtra("position", position)
+        postActivity.putExtra("sort", sharedPreference.getBoolean("sort", true))
+        postActivity.putExtra("theme", binding.fabe.currentTextColor)
         startActivity(postActivity)
     }
 }

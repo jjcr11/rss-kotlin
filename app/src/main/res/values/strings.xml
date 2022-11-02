@@ -26,5 +26,7 @@
     <string name="corner_radius">Corner radius</string>
     <string name="dark_theme">Dark theme</string>
     <string name="warning">*You must reboot the app to see some changes</string>
-    <string name="empty_saved">You can save post here to read later by clicking the bookmark icon in each post</string>
+    <string name="empty_saved">Save post to read later by clicking the bookmark icon in each post</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

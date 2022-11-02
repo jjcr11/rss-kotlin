@@ -1,15 +1,76 @@
 package com.reader.rss
 
+import android.Manifest
+import android.app.Activity
 import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
-import com.reader.rss.databinding.ActivitySettingsBinding
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.reader.rss.databinding.ActivitySettingsBinding
+import kotlinx.coroutines.*
 import org.jsoup.Jsoup
+import java.io.File
+import java.io.InputStreamReader
 
 class SettingsActivity : AppCompatActivity() {
 
-    lateinit var binding: ActivitySettingsBinding
+    private lateinit var binding: ActivitySettingsBinding
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var openIntent: Intent
+
+    private var activityResultLaunch = registerForActivityResult(StartActivityForResult()) { result ->
+        if(result.resultCode == Activity.RESULT_OK) {
+            val uri = result.data?.data!!
+            val inputStream = contentResolver.openInputStream(uri)
+            val inputStreamReader = InputStreamReader(inputStream)
+            val sourceXFeedType = object : TypeToken<MutableList<SourceXFeed?>?>() {}.type
+
+            val sourceXFeeds: List<SourceXFeed> = Gson().fromJson(inputStreamReader.readText(), sourceXFeedType)
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    for (source in sourceXFeeds) {
+
+                        val s = SourceEntity(
+                            source.id,
+                            source.name,
+                            source.url,
+                            source.count
+                        )
+                        DatabaseApplication.database.dao().addSource(s)
+                        for (feed in source.feeds) {
+                            val f = FeedEntity(
+                                feed.id,
+                                feed.title,
+                                feed.url,
+                                feed.author,
+                                feed.date,
+                                feed.content,
+                                feed.sourceId,
+                                feed.read,
+                                feed.saved
+                            )
+                            DatabaseApplication.database.dao().addFeed(f)
+                        }
+                    }
+                }
+                Toast.makeText(baseContext, "Successfully", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,10 +80,37 @@ class SettingsActivity : AppCompatActivity() {
 
         supportActionBar?.hide()
 
+        openIntent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "*/*"
+        }
+
+        requestPermissionLauncher =
+            registerForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { isGranted: Boolean ->
+                if (isGranted) {
+                    activityResultLaunch.launch(openIntent)
+                }
+            }
+
         val sharedPreference = getSharedPreferences("settings",Context.MODE_PRIVATE)
         binding.sSize.value = sharedPreference.getInt("size", 24).toFloat()
         binding.sLineHeight.value = sharedPreference.getInt("lineHeight", 24).toFloat()
         binding.sCornerRadius.value = sharedPreference.getInt("cornerRadius", 0).toFloat()
+        binding.tvDeleteAfter.text = when(sharedPreference.getInt("indexDays", 2)) {
+            0 -> "After 1 day"
+            1 -> "After 2 days"
+            2 -> "After 5 days"
+            3 -> "After 10 days"
+            4 -> "After 15 days"
+            else -> "Never"
+        }
+        binding.tvThemeSystem.text = when(sharedPreference.getInt("theme", 2)) {
+            0 -> "Yes"
+            1 -> "No"
+            else -> "System"
+        }
 
 
         binding.tvValueSize.text = binding.sSize.value.toInt().toString()
@@ -30,6 +118,8 @@ class SettingsActivity : AppCompatActivity() {
         binding.tvValueCornerRadius.text = binding.sCornerRadius.value.toInt().toString()
 
         binding.cv.radius = binding.sCornerRadius.value
+
+
 
         var align = sharedPreference.getString("align", "Left")
         when (align) {
@@ -47,9 +137,23 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-        binding.sm.isChecked = sharedPreference.getBoolean("theme", false)
-        val background = if(binding.sm.isChecked) { "rgb(36, 36, 36)" } else { "rgb(255, 255, 255)" }
-        val text = if(binding.sm.isChecked) { "rgb(255, 255, 255)" } else { "rgb(36, 36, 36)" }
+        val background: String
+        val text: String
+
+        when(binding.tvThemeSystem.currentTextColor) {
+            -14408668 -> {
+                background = "rgb(255, 255, 255)"
+                text = "rgb(36, 36, 36)"
+            }
+            else -> {
+                background = "rgb(36, 36, 36)"
+                text = "rgb(255, 255, 255)"
+            }
+        }
+
+        sharedPreference.edit().putString("background", background).apply()
+
+
 
         val body = Jsoup.parse("<h1>Title</h1>")
         body.append("<div class=\"source\">Source / Unknown</div>")
@@ -76,7 +180,7 @@ class SettingsActivity : AppCompatActivity() {
         )
         binding.wvLorem.loadData(body.html(), "text/html", null)
 
-        binding.sSize.addOnChangeListener { slider, value, fromUser ->
+        binding.sSize.addOnChangeListener { _, value, _ ->
             binding.tvValueSize.text = value.toInt().toString()
             head.getElementsByTag("style").remove()
             head.append(
@@ -102,7 +206,7 @@ class SettingsActivity : AppCompatActivity() {
             sharedPreference.edit().putInt("size", value.toInt()).apply()
         }
 
-        binding.sLineHeight.addOnChangeListener { slider, value, fromUser ->
+        binding.sLineHeight.addOnChangeListener { _, value, _ ->
             binding.tvValueLineHeight.text = value.toInt().toString()
             head.getElementsByTag("style").remove()
             head.append(
@@ -128,7 +232,7 @@ class SettingsActivity : AppCompatActivity() {
             sharedPreference.edit().putInt("lineHeight", value.toInt()).apply()
         }
 
-        binding.mbtg.addOnButtonCheckedListener { group, checkedId, isChecked ->
+        binding.mbtg.addOnButtonCheckedListener { _, checkedId, _ ->
             align = findViewById<MaterialButton>(checkedId).text.toString()
             head.getElementsByTag("style").remove()
             head.append(
@@ -160,15 +264,110 @@ class SettingsActivity : AppCompatActivity() {
             sharedPreference.edit().putInt("cornerRadius", value.toInt()).apply()
         }
 
-        binding.sm.setOnCheckedChangeListener { buttonView, isChecked ->
-            sharedPreference.edit().putBoolean("theme", isChecked).apply()
+        binding.cvTheme.setOnClickListener {
+            var i = sharedPreference.getInt("theme", 2)
+            val options = arrayOf("Yes", "No", "System")
+            MaterialAlertDialogBuilder(this)
+                .setTitle("Night theme")
+                .setSingleChoiceItems(options, i) { _, index ->
+                    i = index
+                }
+                .setPositiveButton("Accept") { _, _ ->
+                    when(i) {
+                        0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                        1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                        2 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                    }
+                    binding.tvThemeSystem.text = options[i]
+                    sharedPreference.edit().putInt("theme", i).apply()
+                }
+                .show()
+        }
+
+        binding.cvDelete.setOnClickListener {
+            var i = sharedPreference.getInt("indexDays", 2)
+            val time = arrayOf("After 1 day", "After 2 days", "After 5 days", "After 10 days",
+                "After 15 days", "Never")
+            MaterialAlertDialogBuilder(this)
+                .setTitle("Delete unread feeds")
+                .setSingleChoiceItems(time, i) { _, index ->
+                    i = index
+                }
+                .setPositiveButton("Accept") { _, _ ->
+                    binding.tvDeleteAfter.text = time[i]
+                    sharedPreference.edit().putInt("indexDays", i).apply()
+                }
+                .show()
+        }
+
+        binding.cvExportImport.setOnClickListener {
+            val actions = arrayOf("Export", "Import")
+            MaterialAlertDialogBuilder(this)
+                .setItems(actions) { _, index ->
+                    when(index) {
+                        0 -> {
+                            lifecycleScope.launch(Dispatchers.IO) {
+                                val auxList: MutableList<SourceXFeed> = mutableListOf()
+                                val sources = DatabaseApplication.database.dao().getAllSources()
+                                for(source in sources) {
+                                    val aux = SourceXFeed(
+                                        source.id,
+                                        source.name!!,
+                                        source.url!!,
+                                        source.count,
+                                    )
+                                    val feeds = DatabaseApplication.database.dao().getAllFeedsById(source.id)
+                                    for(feed in feeds) {
+                                        aux.feeds.add(feed)
+                                    }
+                                    auxList.add(aux)
+                                }
+                                val content: String = Gson().toJson(auxList)
+                                val file = File(baseContext.filesDir, "backup.json")
+
+                                file.writeText(content)
+                                val shareIntent: Intent = Intent().apply {
+                                    action = Intent.ACTION_SEND
+                                    putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(
+                                        baseContext,
+                                        baseContext.applicationContext.packageName + ".provider", file))
+                                    type = "text/json"
+                                }
+                                startActivity(Intent.createChooser(shareIntent, null))
+                            }
+                        }
+                        1 -> {
+                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                when {
+                                    ContextCompat.checkSelfPermission(
+                                        baseContext,
+                                        Manifest.permission.READ_EXTERNAL_STORAGE
+                                    ) == PackageManager.PERMISSION_GRANTED -> {
+                                        activityResultLaunch.launch(openIntent)
+                                    }
+                                    shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE) -> {
+                                        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                                    }
+                                    else -> {
+                                        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                                    }
+                                }
+                            } else {
+                                activityResultLaunch.launch(openIntent)
+                            }
+                        }
+                    }
+                }
+                .setNegativeButton("Cancel") { _, _ -> }
+                .show()
         }
 
         binding.mbtnReset.setOnClickListener {
             binding.sSize.value = 24f
             binding.sLineHeight.value = 24f
             binding.sCornerRadius.value = 0f
-            binding.sm.isChecked = false
+            binding.tvDeleteAfter.text = "After 5 days"
+            sharedPreference.edit().putInt("indexDays", 2).apply()
         }
     }
 }

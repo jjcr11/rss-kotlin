@@ -32,19 +32,15 @@ class SourceAdapter(
             binding.tvUrl.text = source.url
             binding.imgDelete.setOnClickListener {
                 val t = Thread {
-                    val f = com.reader.rss.DatabaseApplication.database.dao().getAllFeedsById(source.id)
-                    com.reader.rss.DatabaseApplication.database.dao().deleteFeeds(f)
-                    com.reader.rss.DatabaseApplication.database.dao().deleteSource(source.id)
+                    val f = DatabaseApplication.database.dao().getAllFeedsById(source.id)
+                    DatabaseApplication.database.dao().deleteFeeds(f)
+                    DatabaseApplication.database.dao().deleteSource(source.id)
                 }
                 t.start()
                 t.join()
                 sources.remove(source)
                 notifyDataSetChanged()
-                Toast.makeText(
-                    context,
-                    "You can see the feeds from ${source.name} until close the app",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(context, "${source.name} deleted", Toast.LENGTH_SHORT).show()
             }
         }
     }
