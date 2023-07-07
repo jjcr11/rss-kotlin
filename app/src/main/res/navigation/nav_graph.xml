@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/listFeedFragment">
+
+    <fragment
+        android:id="@+id/listFeedFragment"
+        android:name="com.jjcr11.rss.view.ListFeedFragment"
+        android:label="fragment_list_feed"
+        tools:layout="@layout/fragment_list_feed">
+        <action
+            android:id="@+id/action_listFeedFragment_to_listSourceFragment"
+            app:destination="@id/listSourceFragment"
+            app:enterAnim="@anim/anim_enter"
+            app:exitAnim="@anim/anim_exit"
+            app:popEnterAnim="@anim/anim_pop_enter"
+            app:popExitAnim="@anim/anim_pop_exit" />
+        <action
+            android:id="@+id/action_listFeedFragment_to_feedFragment"
+            app:destination="@id/feedFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/listSourceFragment"
+        android:name="com.jjcr11.rss.view.ListSourceFragment"
+        android:label="fragment_list_source"
+        tools:layout="@layout/fragment_list_source" />
+    <fragment
+        android:id="@+id/feedFragment"
+        android:name="com.jjcr11.rss.view.FeedFragment"
+        android:label="fragment_feed"
+        tools:layout="@layout/fragment_feed">
+        <argument
+            android:name="feeds"
+            app:argType="com.jjcr11.rss.data.model.Feed[]" />
+    </fragment>
+</navigation>
