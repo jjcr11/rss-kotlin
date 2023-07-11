@@ -1,14 +1,19 @@
 package com.jjcr11.rss.view
 
+import android.graphics.Typeface
+import android.graphics.text.LineBreaker
+import android.os.Build
 import android.os.Bundle
 import android.text.Html
-import android.util.Log
+import android.text.method.LinkMovementMethod
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.setMargins
 import com.bumptech.glide.Glide
 import com.jjcr11.rss.R
 import com.jjcr11.rss.data.model.Feed
@@ -20,9 +25,6 @@ class FeedItemFragment(
 ) : Fragment() {
 
     private lateinit var mBinding: FragmentFeedItemBinding
-    //private val r = Regex("""style *= *".*"""")
-    //private val r2 = Regex("#")
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,75 +32,81 @@ class FeedItemFragment(
     ): View {
         mBinding = FragmentFeedItemBinding.inflate(inflater, container, false)
 
-        //mBinding.tv.text = Html.fromHtml(feed.description).toString()
-
-        //Html.ImageGetter("")
-
-        //feed.description.replace(r, "")
-
+        val density = resources.displayMetrics.density
         val document = Jsoup.parse(feed.description)
+
+        var textView = TextView(requireContext()).also {
+            it.text = feed.title
+            it.textSize = 8 * density
+            val layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            layoutParams.setMargins(
+                (5 * density).toInt(),
+                (7 * density).toInt(),
+                (5 * density).toInt(),
+                (7 * density).toInt()
+            )
+            it.layoutParams = layoutParams
+            it.setTextColor(resources.getColor(R.color.black, null))
+            it.setTypeface(it.typeface, Typeface.BOLD)
+        }
+        mBinding.ll.addView(textView)
+
         document.allElements.forEach {
-            //Log.d("", "${it.tag()}")
             when (it.tag().toString()) {
                 "img" -> {
-                    val u = it.attr("src")
-                    val t = ImageView(requireContext())
+                    val url = it.attr("src")
+                    val imageView = ImageView(requireContext()).also { iv ->
+                        val layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        )
+                        layoutParams.setMargins((5 * density).toInt())
+                        iv.layoutParams = layoutParams
+                    }
                     Glide.with(this)
-                        .load(u)
-                        .into(t)
-                    mBinding.ll.addView(t)
+                        .load(url)
+                        .into(imageView)
+                    mBinding.ll.addView(imageView)
                 }
+
                 "p" -> {
-                    val t = TextView(requireContext())
-                    t.text = it.text()
-                    mBinding.ll.addView(t)
+                    textView = TextView(requireContext()).also { tv ->
+                        val a = it.getElementsByTag("a")
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            tv.justificationMode = LineBreaker.JUSTIFICATION_MODE_INTER_WORD
+                        }
+
+                        tv.textSize = 7 * density
+                        val layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        )
+                        layoutParams.setMargins(
+                            (5 * density).toInt(),
+                            (7 * density).toInt(),
+                            (5 * density).toInt(),
+                            0
+                        )
+                        tv.layoutParams = layoutParams
+                        if (a.isNotEmpty()) {
+                            tv.isClickable = true
+                            tv.movementMethod = LinkMovementMethod.getInstance()
+                            tv.text = Html.fromHtml(a.toString())
+                            tv.setTextColor(resources.getColor(R.color.blue_light, null))
+                        } else {
+                            tv.text = it.text()
+                            tv.setTextColor(resources.getColor(R.color.black, null))
+                        }
+
+                    }
+                    mBinding.ll.addView(textView)
                 }
             }
         }
-        /*val b = a.getElementsByTag("img")
-        b.forEach {
-            //Log.d("", "${it.attr("src")}")
-            val u = it.attr("src")
-            val t = ImageView(requireContext())
-            Glide.with(this)
-                .load(u)
-                .into(t)
-            mBinding.ll.addView(t)
-        }*/
-
-        val s = """
-                <style>
-                    * {
-                        text-align: justify;
-                        font-size: ${20};
-                    }
-                    .source {
-                        font-style: italic;
-                    }
-                    h1 {
-                        font-size: ${8}px;
-                    }
-                    a:link {
-                        
-                    }
-                    img {
-                        width: 100%;
-                        height: auto;
-                    }
-                    video {
-                        width: 100%;
-                        height: auto;
-                    }
-                    iframe {
-                        width: 100%;
-                        height: auto;
-                    }
-                </style>
-                """.trimIndent()
-
-        //mBinding.wv.settings.javaScriptEnabled = true
-
-        //mBinding.wv.loadData("$s${feed.description}", "text/html", null)
 
         return mBinding.root
     }
