@@ -24,6 +24,12 @@ interface Dao {
     @Query("SELECT * FROM Feed")
     fun getFeeds(): List<Feed>
 
-    @Query("SELECT * FROM Feed ORDER BY date")
+    @Query("SELECT * FROM Feed WHERE read = 0 ORDER BY date")
     fun getFeedsByDate(): List<Feed>
+
+    @Query("UPDATE Feed set read = :read WHERE id = :id")
+    fun changeFeedRead(read: Boolean, id: Long)
+
+    @Query("UPDATE Feed set saved = :saved WHERE id = :id")
+    fun changeFeedSaved(saved: Boolean, id: Long)
 }

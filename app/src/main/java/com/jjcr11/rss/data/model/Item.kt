@@ -59,6 +59,6 @@ data class Feed(
     val link: String,
     val description: String,
     val date: Date,
-    var red: Boolean = false,
+    var read: Boolean = false,
     var saved: Boolean = false
 ) : Parcelable

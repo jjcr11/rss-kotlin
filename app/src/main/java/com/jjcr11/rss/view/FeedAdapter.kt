@@ -18,9 +18,9 @@ class FeedAdapter(
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val binding = FeedItemBinding.bind(view)
-        fun setListener(feeds: List<Feed>) {
+        fun setListener(feeds: List<Feed>, position: Int) {
             binding.root.setOnClickListener {
-                listener.onClick(feeds)
+                listener.onClick(feeds, position)
             }
         }
     }
@@ -38,7 +38,7 @@ class FeedAdapter(
             it.tvSource.text = feed.sourceId.toString()
             it.tvHour.text = feed.date.toString()
         }
-        holder.setListener(feeds)
+        holder.setListener(feeds, position)
     }
 
     override fun getItemCount(): Int = feeds.size
@@ -46,5 +46,10 @@ class FeedAdapter(
     fun add(feed: Feed) {
         notifyItemInserted(itemCount)
         feeds.add(feed)
+    }
+
+    fun clear() {
+        notifyItemRangeRemoved(0, itemCount)
+        feeds.clear()
     }
 }

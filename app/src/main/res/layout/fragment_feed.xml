@@ -11,9 +11,11 @@
         android:layout_height="wrap_content">
 
         <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/mtb"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="TITULO" />
+            app:menu="@menu/top_app_bar_post"
+            app:title="Post" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.viewpager2.widget.ViewPager2
