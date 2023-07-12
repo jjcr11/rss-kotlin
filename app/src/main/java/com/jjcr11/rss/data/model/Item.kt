@@ -27,6 +27,29 @@ data class Item @JvmOverloads constructor(
     var date: String? = null
 )
 
+@Root(name = "item", strict = false)
+data class ItemContent @JvmOverloads constructor(
+    @field:Element(name = "title")
+    @param:Element(name = "title")
+    var title: String? = null,
+
+    @field:Element(name = "link")
+    @param:Element(name = "link")
+    var link: String? = null,
+
+    @field:Element(name = "description")
+    @param:Element(name = "description")
+    var description: String? = null,
+
+    @field:Element(name = "pubDate")
+    @param:Element(name = "pubDate")
+    var date: String? = null,
+
+    @field:Element(name = "encoded")
+    @param:Element(name = "encoded")
+    var content: String? = null
+)
+
 @Entity
 @Parcelize
 data class Feed(

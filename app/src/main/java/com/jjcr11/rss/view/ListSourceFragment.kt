@@ -74,22 +74,15 @@ class ListSourceFragment : Fragment() {
                 .baseUrl(text.take(index + 1))
                 .addConverterFactory(SimpleXmlConverterFactory.create())
                 .build()
+            val api = retrofit.create(APIService::class.java)
             lifecycleScope.launch(Dispatchers.IO) {
-                val call = retrofit.create(APIService::class.java)
-                    .getChannel(text.takeLast(text.length - index - 1))
-                val channel = call.body()
-
-                channel?.title?.let {
-                    val source = Source(0, it, text)
-                    AppDatabase.getDatabase(requireContext()).dao().addSource(source)
-                    val id = AppDatabase.getDatabase(requireContext()).dao().getLastSourceId()
-                    channel.items?.forEach { item ->
-                        val date = SimpleDateFormat("E, dd LLL yyyy HH:mm:ss Z").parse(item.date)
-                        val feed = Feed(0, id, item.title!!, item.link!!, item.description!!, date)
-                        AppDatabase.getDatabase(requireContext()).dao().addFeed(feed)
-                    }
+                try {
+                    addRssContent(api, text, index)
+                } catch (e: Exception) {
+                    addRss(api, text, index)
+                }?.let {
                     launch(Dispatchers.Main) {
-                        mAdapter.add(source)
+                        mAdapter.add(it)
                     }
                 }
             }
@@ -121,5 +114,40 @@ class ListSourceFragment : Fragment() {
             })
 
         return mBinding.root
+    }
+
+    private suspend fun addRssContent(api: APIService, text: String, index: Int): Source? {
+        val call = api.getChannelContent(text.takeLast(text.length - index - 1))
+        return call.body()?.let {
+            val source = Source(0, it.title!!, text)
+            val id = addSource(source)
+            it.items?.forEach { item ->
+                addFeed(id, item.title!!, item.link!!, item.content!!, item.date!!)
+            }
+            source
+        }
+    }
+
+    private suspend fun addRss(api: APIService, text: String, index: Int): Source? {
+        val call = api.getChannel(text.takeLast(text.length - index - 1))
+        return call.body()?.let {
+            val source = Source(0, it.title!!, text)
+            val id = addSource(source)
+            it.items?.forEach { item ->
+                addFeed(id, item.title!!, item.link!!, item.description!!, item.date!!)
+            }
+            source
+        }
+    }
+
+    private fun addSource(source: Source): Long {
+        AppDatabase.getDatabase(requireContext()).dao().addSource(source)
+        return AppDatabase.getDatabase(requireContext()).dao().getLastSourceId()
+    }
+
+    private fun addFeed(id: Long, title: String, link: String, content: String, date: String) {
+        val nDate = SimpleDateFormat("E, dd LLL yyyy HH:mm:ss Z").parse(date)
+        val feed = Feed(0, id, title, link, content, nDate)
+        AppDatabase.getDatabase(requireContext()).dao().addFeed(feed)
     }
 }

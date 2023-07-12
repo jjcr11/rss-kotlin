@@ -18,7 +18,7 @@ interface Dao {
     @Query("SELECT * FROM Source")
     fun getSourcesWithFeeds(): List<SourceWithFeed>
 
-    @Query("SELECT id FROM Source ORDER BY id LIMIT 1")
+    @Query("SELECT id FROM Source ORDER BY id DESC LIMIT 1")
     fun getLastSourceId(): Long
 
     @Query("SELECT * FROM Feed")
