@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="blue_light">#0C4B57</color>
+    <!--color name="blue_light">#0C4B57</color>
     <color name="blue">#126B7C</color>
     <color name="gray_light">#4E7279</color>
     <color name="gray">#596B6E</color>
     <color name="black">#FFFFFF</color>
     <color name="white">#242424</color>
-    <color name="red">#AE3219</color>
+    <color name="red">#AE3219</color-->
 </resources>
